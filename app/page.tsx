@@ -1,9 +1,11 @@
-import Image from "next/image";
+import React from 'react';
 
-export default function Home() {
+const Home = () => {
   return (
-   <div>
-    Starting
-   </div>
+    <div className="flex h-screen items-center justify-center bg-gray-100 text-gray-800">
+      Starting
+    </div>
   );
-}
+};
+
+export default Home;
