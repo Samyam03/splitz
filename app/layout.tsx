@@ -33,7 +33,9 @@ export default function RootLayout({
         <ClerkProvider>
           <ConvexClientProvider>
             <Header />
-            <main className="min-h-screen">{children}</main>
+            <main className="min-h-screen pt-16"> {/* Added pt-16 for top padding */}
+              {children}
+            </main>
           </ConvexClientProvider>
         </ClerkProvider>
       </body>

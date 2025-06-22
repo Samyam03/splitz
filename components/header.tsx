@@ -61,7 +61,7 @@ const Header = () => {
           <Authenticated>
             <div className="flex items-center gap-10">
               <Link href="/dashboard">
-                <Button variant="outline" className="gap-2 px-5 py-2 rounded-xl text-sm font-semibold">
+                <Button variant="outline" className="gap-2 px-5 py-2 rounded-xl text-black font-semibold">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Button>
