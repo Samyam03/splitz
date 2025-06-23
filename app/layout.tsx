@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import { ConvexClientProvider } from "@/components/convex_client_provider";
 import { ClerkProvider } from '@clerk/nextjs'
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
             <Header />
             <main className="min-h-screen pt-16"> {/* Added pt-16 for top padding */}
               {children}
+              <Toaster richColors />
             </main>
           </ConvexClientProvider>
         </ClerkProvider>
