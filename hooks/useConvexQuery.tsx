@@ -1,14 +1,36 @@
 import { useQuery, useMutation } from "convex/react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+import { api } from "@/convex/_generated/api";
 
 export const useConvexQuery = (query: any, args?: any) => {
-  const result = useQuery(query, args);
+  const { isLoaded, isSignedIn } = useAuth();
   const [data, setData] = useState<any>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Always call useQuery, but pass a conditional query
+  const result = useQuery(
+    isLoaded && isSignedIn ? query : api.users.skip,
+    args
+  );
+
   useEffect(() => {
+    // If auth is not loaded yet, keep loading
+    if (!isLoaded) {
+      setLoading(true);
+      return;
+    }
+
+    // If user is not signed in, set data to null and stop loading
+    if (!isSignedIn) {
+      setData(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     if (result === undefined) {
       setLoading(true);
     } else {
@@ -26,7 +48,7 @@ export const useConvexQuery = (query: any, args?: any) => {
         setLoading(false);
       }
     }
-  }, [result]);
+  }, [result, isLoaded, isSignedIn]);
 
   return { data, loading, error };
 };

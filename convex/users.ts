@@ -56,3 +56,10 @@ export const getUser = query({
     return user;
   },
 });
+
+export const skip = query({
+  args: {},
+  handler: async () => {
+    return null;
+  },
+});

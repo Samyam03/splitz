@@ -10,15 +10,51 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { AvatarFallback } from '@radix-ui/react-avatar';
 import Link from 'next/link';
+import { useAuth } from '@clerk/nextjs';
 
 export default function ContactsPage() {
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+  const { isLoaded, isSignedIn } = useAuth();
   const { data, loading, error } = useConvexQuery(api.contacts.getContacts);
 
+  // Show loading while auth is loading
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <BarLoader color="#3b82f6" />
+      </div>
+    );
+  }
+
+  // Show message if user is not signed in
+  if (!isSignedIn) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Please sign in to view contacts</h1>
+          <p className="text-gray-600">You need to be authenticated to access this page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while data is being fetched
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <BarLoader color="#3b82f6" />
+      </div>
+    );
+  }
+
+  // Show error if there's an error
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-800 mb-4">Error loading contacts</h1>
+          <p className="text-gray-600">{error.message}</p>
+        </div>
       </div>
     );
   }
