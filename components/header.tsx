@@ -7,17 +7,13 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-import { useStoreUserEffect } from '@/hooks/useStoreUserEffect'
 import { Authenticated, Unauthenticated } from 'convex/react'
 import { Button } from '@/components/ui/button'
 import { LayoutDashboard } from 'lucide-react'
-import BarLoader from 'react-spinners/BarLoader'
 import Link from 'next/link'
 import Image from 'next/image'
 
 const Header = () => {
-  const { isLoading } = useStoreUserEffect()
-
   return (
     <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm px-6 sm:px-8 flex items-center z-50">
       <div className="w-full max-w-7xl mx-auto flex items-center">
@@ -71,18 +67,6 @@ const Header = () => {
           </Authenticated>
         </div>
       </div>
-
-      {/* Loading indicator */}
-      {isLoading && (
-        <div className="absolute bottom-0 left-0 w-full">
-          <BarLoader
-            width="100%"
-            height={3}
-            color="#3B82F6"
-            loading={true}
-          />
-        </div>
-      )}
     </nav>
   )
 }

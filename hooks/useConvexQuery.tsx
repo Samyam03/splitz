@@ -63,17 +63,37 @@ export const useConvexMutation = (mutation: any) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await mutationFn(args);
+      // Add timeout to prevent hanging mutations
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Request timeout - please try again")), 20000)
+      );
+      
+      const mutationPromise = mutationFn(args);
+      const response = await Promise.race([mutationPromise, timeoutPromise]);
+      
       setData(response);
       return response;
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       setError(error);
-      if (error.message !== "User not authenticated" && 
-          error.message !== "Called storeUser without authentication present") {
-        toast.error(error.message);
+      
+      // Handle WebSocket specific errors with better messaging
+      if (error.message.includes("TooManyConcurrentMutations") || 
+          error.message.includes("WebSocket") ||
+          error.message.includes("timeout")) {
+        const wsError = new Error("Connection issue - please wait a moment and try again");
+        if (error.message !== "User not authenticated" && 
+            error.message !== "Called storeUser without authentication present") {
+          toast.error(wsError.message);
+        }
+        throw wsError;
+      } else {
+        if (error.message !== "User not authenticated" && 
+            error.message !== "Called storeUser without authentication present") {
+          toast.error(error.message);
+        }
+        throw error;
       }
-      throw error;
     } finally {
       setLoading(false);
     }

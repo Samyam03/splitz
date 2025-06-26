@@ -11,11 +11,16 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { AvatarFallback } from '@radix-ui/react-avatar';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
+import CreateGroupModal from './_components/group-modal';
+import { useRouter } from 'next/navigation';
 
 export default function ContactsPage() {
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
+
   const { isLoaded, isSignedIn } = useAuth();
   const { data, loading, error } = useConvexQuery(api.contacts.getContacts);
+
+  const router = useRouter();
 
   // Show loading while auth is loading
   if (!isLoaded) {
@@ -155,6 +160,15 @@ export default function ContactsPage() {
           </div>
         </div>
       </div>
+
+      <CreateGroupModal
+        isOpen={isNewGroupModalOpen}
+        isClose={()=>setIsNewGroupModalOpen(false)}
+        onSuccess={(groupId: string) => {
+          setIsNewGroupModalOpen(false);
+          router.push(`/group/${groupId}`);
+        }}
+      />
     </div>
   );
 }
