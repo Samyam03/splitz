@@ -40,6 +40,7 @@ export const useConvexQuery = (query: any, args?: any) => {
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error);
+        // Only show non-auth related errors
         if (error.message !== "User not authenticated" && 
             error.message !== "Called storeUser without authentication present") {
           toast.error(error.message);
@@ -63,9 +64,9 @@ export const useConvexMutation = (mutation: any) => {
     setLoading(true);
     setError(null);
     try {
-      // Add timeout to prevent hanging mutations
+      // Increase timeout and add better error handling
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Request timeout - please try again")), 20000)
+        setTimeout(() => reject(new Error("Request timeout - please try again")), 30000)
       );
       
       const mutationPromise = mutationFn(args);
@@ -77,21 +78,24 @@ export const useConvexMutation = (mutation: any) => {
       const error = err instanceof Error ? err : new Error(String(err));
       setError(error);
       
-      // Handle WebSocket specific errors with better messaging
-      if (error.message.includes("TooManyConcurrentMutations") || 
-          error.message.includes("WebSocket") ||
-          error.message.includes("timeout")) {
+      // Don't show connection errors for auth-related failures
+      if (error.message === "User not authenticated" || 
+          error.message === "Called storeUser without authentication present") {
+        throw error; // Re-throw without showing toast
+      }
+      
+      // Handle specific connection errors
+      if (error.message.includes("TooManyConcurrentMutations")) {
+        const wsError = new Error("Too many requests - please wait a moment and try again");
+        toast.error(wsError.message);
+        throw wsError;
+      } else if (error.message.includes("WebSocket") || error.message.includes("timeout")) {
         const wsError = new Error("Connection issue - please wait a moment and try again");
-        if (error.message !== "User not authenticated" && 
-            error.message !== "Called storeUser without authentication present") {
-          toast.error(wsError.message);
-        }
+        toast.error(wsError.message);
         throw wsError;
       } else {
-        if (error.message !== "User not authenticated" && 
-            error.message !== "Called storeUser without authentication present") {
-          toast.error(error.message);
-        }
+        // Show other errors normally
+        toast.error(error.message);
         throw error;
       }
     } finally {
