@@ -111,7 +111,7 @@ const DashboardPage = () => {
                 </div>
 
                 <p className="text-sm font-medium text-gray-600">
-                  From {balances?.oweDetails?.youOwe?.length || 0} people
+                  From {balances?.oweDetails?.youAreOwed?.length || 0} people
                 </p>
               </CardContent>
             </Card>

@@ -17,8 +17,12 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
 
     if (!oweDetails) return null;
 
-    const hasOwed = oweDetails.youAreOwedBy?.length > 0;
-    const hasOwing = oweDetails.youOwe?.length > 0;
+    // More robust checks for the data
+    const youAreOwed = oweDetails.youAreOwed || [];
+    const youOwe = oweDetails.youOwe || [];
+    
+    const hasOwed = Array.isArray(youAreOwed) && youAreOwed.length > 0;
+    const hasOwing = Array.isArray(youOwe) && youOwe.length > 0;
 
   return (  
     <div className="space-y-4 h-full">
@@ -42,11 +46,11 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
             </div>
             <span>You are owed</span>
             <div className="ml-auto bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
-              {oweDetails.youAreOwedBy?.length}
+              {youAreOwed.length}
             </div>
           </div>
           <div className="space-y-1.5">
-            {oweDetails.youAreOwedBy?.map((item:any)=>{
+            {youAreOwed.map((item:any)=>{
               const userColor = getUserColor(item.userId);
               return (
                 <Link 
@@ -86,11 +90,11 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
             </div>
             <span>You owe</span>
             <div className="ml-auto bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">
-              {oweDetails.youOwe?.length}
+              {youOwe.length}
             </div>
           </div>
           <div className="space-y-1.5">
-            {oweDetails.youOwe?.map((item:any)=>{
+            {youOwe.map((item:any)=>{
               const userColor = getUserColor(item.userId);
               return (
                 <Link 
