@@ -1,5 +1,32 @@
 import { internal } from "./_generated/api";
 import { query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+
+interface UserBalance {
+    owed: number;
+    owedTo: number;
+}
+
+interface BalanceDetails {
+    userId: string;
+    name: string;
+    imageUrl?: string;
+    amount: number;
+}
+
+interface GroupWithBalance {
+    _id: Id<"groups">;
+    name: string;
+    description?: string;
+    createdBy: Id<"users">;
+    members: Array<{
+        userId: Id<"users">;
+        role: string;
+        joinedAt: number;
+    }>;
+    id: Id<"groups">;
+    balance: number;
+}
 
 export const getUserBalances = query({
     handler: async (ctx) => {
@@ -23,7 +50,7 @@ export const getUserBalances = query({
 
         let youOwe = 0;
         let youAreOwed = 0;
-        const balanceByUser: any = {}
+        const balanceByUser: Record<string, UserBalance> = {}
 
 
         for (const expense of expenses) {
@@ -68,8 +95,8 @@ export const getUserBalances = query({
             }
         }
 
-        const youOweList: any[] = []
-        const youAreOwedList: any[] = []
+        const youOweList: BalanceDetails[] = []
+        const youAreOwedList: BalanceDetails[] = []
 
         for (const [uid, balance] of Object.entries(balanceByUser)) {
             const { owed, owedTo } = balance as { owed: number, owedTo: number };
@@ -78,11 +105,11 @@ export const getUserBalances = query({
                 continue;
             }
 
-            const counterpart = await ctx.db.get(uid as any)
+            const counterpart = await ctx.db.get(uid as Id<"users">)
             const base = {
                 userId: uid,
-                name: (counterpart as any)?.name,
-                imageUrl: (counterpart as any)?.imageUrl,
+                name: counterpart?.name || "",
+                imageUrl: counterpart?.imageUrl,
                 amount: Math.abs(net),
             }
 
@@ -142,7 +169,7 @@ export const getTotalSpentByMonth = query({
 
         const userExpenses = allExpenses.filter((expense) => expense.paidByUserId === user?._id || expense.splits.some((split) => split.userId === user?._id));
 
-        const monthlyTotals: any = {}
+        const monthlyTotals: Record<number, number> = {}
 
         for (let i = 0; i < 12; i++) {
             const monthDate = new Date(currentYear, i, 1);
@@ -188,8 +215,8 @@ export const getUserGroups = query({
 
         const groups = allGroups.filter((group) => group.members.some((member) => member.userId === user?._id));
 
-        const enhancedGroups: any = await Promise.all(
-            groups.map(async (group): Promise<any> => {
+        const enhancedGroups: GroupWithBalance[] = await Promise.all(
+            groups.map(async (group): Promise<GroupWithBalance> => {
                 const expenses = await ctx.db
                     .query("expenses")
                     .withIndex("by_group", (q) => q.eq("groupId", group._id))

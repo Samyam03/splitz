@@ -20,8 +20,6 @@ type ContactGroup = {
     type: "group";
 };
 
-type Contact = ContactUser | ContactGroup;
-
 type ContactsResult = {
     users: ContactUser[];
     groups: ContactGroup[];

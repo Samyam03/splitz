@@ -1,11 +1,11 @@
 import { internal } from "./_generated/api";
 import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
 
 export const store = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    console.log(identity);
     if (!identity) {
       throw new Error("Called storeUser without authentication present");
     }
@@ -43,7 +43,7 @@ export const store = mutation({
 
 export const getUser = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("User not authenticated");
@@ -79,7 +79,7 @@ export const searchUsers = query({
     query: v.string(),
   },
   handler: async (ctx, args): Promise<Array<{
-    id: any;
+    id: Id<"users">;
     name: string;
     email: string | null;
     imageUrl?: string;

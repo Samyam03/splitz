@@ -1,11 +1,12 @@
 // convex/seed.ts
 import { mutation } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import { Id, Doc } from "./_generated/dataModel";
+import type { MutationCtx } from "./_generated/server";
 
 // Simple test function to verify the file is being detected
 export const testFunction = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async () => {
     return { message: "Test function works!" };
   },
 });
@@ -73,19 +74,9 @@ export const seedDatabase = mutation({
 
 // Helper to create groups
 async function createGroups(
-  ctx: any,
+  ctx: MutationCtx,
   users: { _id: Id<"users"> }[]
-): Promise<Array<{
-  _id: Id<"groups">;
-  name: string;
-  description: string;
-  createdBy: Id<"users">;
-  members: Array<{
-    userId: Id<"users">;
-    role: string;
-    joinedAt: number;
-  }>;
-}>> {
+): Promise<Doc<"groups">[]> {
   const now = Date.now();
 
   // Using the users from your database
@@ -135,30 +126,16 @@ async function createGroups(
   return await Promise.all(
     groupIds.map(async (id) => {
       const group = await ctx.db.get(id);
-      return { ...group, _id: id };
+      return group as Doc<"groups">;
     })
   );
 }
 
 // Helper to create one-on-one expenses
 async function createOneOnOneExpenses(
-  ctx: any,
+  ctx: MutationCtx,
   users: { _id: Id<"users"> }[]
-): Promise<Array<{
-  _id: Id<"expenses">;
-  description: string;
-  amount: number;
-  category: string;
-  date: number;
-  paidByUserId: Id<"users">;
-  splitType: string;
-  splits: Array<{
-    userId: Id<"users">;
-    amount: number;
-    paid: boolean;
-  }>;
-  createdBy: Id<"users">;
-}>> {
+): Promise<Doc<"expenses">[]> {
   const now = Date.now();
   const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
   const twoWeeksAgo = now - 14 * 24 * 60 * 60 * 1000;
@@ -247,32 +224,17 @@ async function createOneOnOneExpenses(
   return await Promise.all(
     expenseIds.map(async (id) => {
       const expense = await ctx.db.get(id);
-      return { ...expense, _id: id };
+      return expense as Doc<"expenses">;
     })
   );
 }
 
 // Helper to create group expenses
 async function createGroupExpenses(
-  ctx: any,
+  ctx: MutationCtx,
   users: { _id: Id<"users"> }[],
   groups: { _id: Id<"groups"> }[]
-): Promise<Array<{
-  _id: Id<"expenses">;
-  description: string;
-  amount: number;
-  category: string;
-  date: number;
-  paidByUserId: Id<"users">;
-  splitType: string;
-  splits: Array<{
-    userId: Id<"users">;
-    amount: number;
-    paid: boolean;
-  }>;
-  groupId: Id<"groups">;
-  createdBy: Id<"users">;
-}>> {
+): Promise<Doc<"expenses">[]> {
   const now = Date.now();
   const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
   const twoWeeksAgo = now - 14 * 24 * 60 * 60 * 1000;
@@ -429,29 +391,19 @@ async function createGroupExpenses(
   return await Promise.all(
     expenseIds.map(async (id) => {
       const expense = await ctx.db.get(id);
-      return { ...expense, _id: id };
+      return expense as Doc<"expenses">;
     })
   );
 }
 
 // Helper to create settlements
 async function createSettlements(
-  ctx: any,
+  ctx: MutationCtx,
   users: { _id: Id<"users"> }[],
   groups: { _id: Id<"groups"> }[],
   oneOnOneExpenses: { _id: Id<"expenses">; description: string }[],
   groupExpenses: { _id: Id<"expenses">; description: string }[]
-): Promise<Array<{
-  _id: Id<"settlements">;
-  amount: number;
-  note: string;
-  date: number;
-  paidByUserId: Id<"users">;
-  receivedByUserId: Id<"users">;
-  relatedExpenseIds?: Id<"expenses">[];
-  groupId?: Id<"groups">;
-  createdBy: Id<"users">;
-}>> {
+): Promise<Doc<"settlements">[]> {
   const now = Date.now();
   const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
   const fiveDaysAgo = now - 5 * 24 * 60 * 60 * 1000;
@@ -520,7 +472,7 @@ async function createSettlements(
   return await Promise.all(
     settlementIds.map(async (id) => {
       const settlement = await ctx.db.get(id);
-      return { ...settlement, _id: id };
+      return settlement as Doc<"settlements">;
     })
   );
 }

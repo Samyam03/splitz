@@ -129,7 +129,7 @@ export default function ContactsPage() {
                     {users.map((user: any) => {
                       const userColor = getUserColor(user.id);
                       return (
-                        <Link key={user.id} href={`/person/${user.id}`} className="block">
+                        <Link key={user.id} href={`/user/${user.id}`} className="block">
                           <Card className="hover:shadow-md transition-all duration-200 border-0 bg-white hover:bg-gradient-to-r hover:from-white hover:to-purple-50">
                             <CardContent className="p-4">
                               <div className="flex items-center gap-4">

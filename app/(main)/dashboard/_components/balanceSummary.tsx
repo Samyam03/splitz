@@ -54,7 +54,7 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
               const userColor = getUserColor(item.userId);
               return (
                 <Link 
-                  href={`/person/${item.userId}`} 
+                  href={`/user/${item.userId}`} 
                   key={item.userId}
                   className="block group"
                 >
@@ -98,7 +98,7 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
               const userColor = getUserColor(item.userId);
               return (
                 <Link 
-                  href={`/person/${item.userId}`} 
+                  href={`/user/${item.userId}`} 
                   key={item.userId}
                   className="block group"
                 >

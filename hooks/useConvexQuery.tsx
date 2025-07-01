@@ -13,7 +13,7 @@ export const useConvexQuery = (query: any, args?: any) => {
   // Always call useQuery, but pass a conditional query
   const result = useQuery(
     isLoaded && isSignedIn ? query : api.users.skip,
-    args
+    isLoaded && isSignedIn ? args : undefined
   );
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 
 export const getGroupExpenses = query({
   args: {
@@ -96,7 +97,12 @@ export const getGroupExpenses = query({
         .map((other) => ({ from: other, amount: ledger[other][member.id] })),
     }));
 
-         const userLookUpMap: Record<string, any> = {};
+         const userLookUpMap: Record<string, {
+            id: Id<"users">;
+            name?: string;
+            imageUrl?: string;
+            role: string;
+         }> = {};
 
      memberDetails.forEach((member)=>{
          userLookUpMap[member.id] = member;
