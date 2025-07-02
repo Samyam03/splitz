@@ -37,10 +37,10 @@ const SettlementsList = ({
 
   if(!settlements || !settlements.length){
     return(
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-gray-50 to-slate-50">
+      <Card className="shadow-lg border border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50">
         <CardContent className="p-8">
           <div className="text-center space-y-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-gray-400 to-slate-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
               <ArrowRightLeft className="w-6 h-6 text-white" />
             </div>
             <p className="text-gray-700 font-semibold">No settlements found</p>
@@ -70,16 +70,16 @@ const SettlementsList = ({
         const isCurrentUserReceiver = settlement.receiverId === currentUser.data?._id
 
         return(
-          <Card key={settlement.id || `settlement-${index}`} className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"> 
+          <Card key={settlement.id || `settlement-${index}`} className="shadow-lg border border-gray-200 bg-gradient-to-br from-white to-blue-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"> 
             <CardContent className="p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1">
-                  <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl shadow-sm">
-                    <ArrowRightLeft className="w-6 h-6 text-green-600" />
+                  <div className="p-3 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl shadow-sm">
+                    <ArrowRightLeft className="w-6 h-6 text-blue-600" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-emerald-700 text-xl mb-1 truncate" title={settlement.note || 'Settlement'}>
+                    <h3 className="font-bold text-blue-700 text-xl mb-1 truncate" title={settlement.note || 'Settlement'}>
                       {settlement.note ? settlement.note : 'Settlement'}
                     </h3>
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
@@ -93,11 +93,11 @@ const SettlementsList = ({
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-end gap-3">
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-gray-900">
-                      ${settlement.amount.toFixed(2)}
-                    </div>
+                                  <div className="flex flex-col items-end gap-3">
+                    <div className="text-right">
+                      <div className={`text-2xl font-bold ${isCurrentUserPayer ? 'text-blue-600' : isCurrentUserReceiver ? 'text-blue-500' : 'text-blue-400'}`}>
+                        ${settlement.amount.toFixed(2)}
+                      </div>
                     {isGroupSettlement ?(
                       <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200">
                         Group Settlement
@@ -105,23 +105,23 @@ const SettlementsList = ({
                     ):(
                       <div className="text-sm text-gray-600">
                         {isCurrentUserPayer ? (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 border border-green-200 font-medium">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
-                            You paid
+                            You sent payment
                           </span>
                         ) : isCurrentUserReceiver ? (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5l-9-2 9 18 9-18-9 2zm0 0v8" />
                             </svg>
-                            You received
+                            You received payment
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
                             </svg>
                             {payer.name} paid {receiver.name}
                           </span>

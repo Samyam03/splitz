@@ -20,6 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SettlementsList from "@/components/settlementsList";
 import ExpenseList from "@/components/expenseList";
+import { getUserColor } from "@/lib/userColors";
 
 
 const UserPage = () => {
@@ -71,9 +72,9 @@ const UserPage = () => {
   }
 
   return (
-    <div className="px-4 sm:px-8 py-6 w-full">
+    <div className="px-4 sm:px-8 py-6 w-full space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
           <Button 
             variant="outline" 
@@ -102,123 +103,124 @@ const UserPage = () => {
       </div>
 
       {/* User Profile & Balance Card */}
-      <div className="mb-8">
-        <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between gap-6">
-              {/* User Info Section - Left */}
-              <div className="flex items-center gap-3">
+      <Card className={`shadow-lg border border-gray-200 ${balance === 0 ? 'bg-gradient-to-br from-gray-50 to-slate-50' : balance > 0 ? 'bg-gradient-to-br from-white to-emerald-50' : 'bg-gradient-to-br from-white to-rose-50'}`}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between gap-6">
+            {/* User Info Section - Left */}
+                          <div className="flex items-center gap-4">
                 <div className="relative">
-                  <Avatar className="h-12 w-12 ring-2 ring-white shadow-md">
-                    <AvatarImage src={otherUser.imageUrl} />
-                    <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
-                      {otherUser.name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
+                  {(() => {
+                    const userColor = getUserColor(otherUser.id);
+                    return (
+                      <Avatar className={`w-16 h-16 ring-2 ${userColor.ring} shadow-md`}>
+                        <AvatarImage src={otherUser.imageUrl} />
+                        <AvatarFallback className={`flex items-center justify-center ${userColor.bg} ${userColor.text} font-semibold w-full h-full text-lg`}>
+                          {otherUser.name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    );
+                  })()}
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-0.5">
-                    {otherUser.name || 'Unknown User'}
-                  </h2>
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
-                    <span className="text-sm font-medium">{otherUser.email || 'No email'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Balance Section - Right */}
-              <div className="text-right">
-                <div className="text-2xl font-bold mb-1">
-                  {balance === 0 ? (
-                    <span className="text-gray-600">$0.00</span>
-                  ) : balance > 0 ? (
-                    <span className="text-green-600">
-                      +${balance.toFixed(2)}
-                    </span>
-                  ) : (
-                    <span className="text-red-600">
-                      -${Math.abs(balance).toFixed(2)}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center justify-end gap-1">
-                  {balance === 0 ? (
-                    <div className="flex items-center gap-1 text-green-600">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-xs font-medium">All settled</span>
-                    </div>
-                  ) : balance > 0 ? (
-                    <div className="flex items-center gap-1 text-green-600">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                      </svg>
-                      <span className="text-xs font-medium">You're owed</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 text-red-600">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                      </svg>
-                      <span className="text-xs font-medium">You owe</span>
-                    </div>
-                  )}
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">
+                  {otherUser.name || 'Unknown User'}
+                </h2>
+                <div className="flex items-center gap-1 text-gray-600">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                  <span className="text-sm font-medium">{otherUser.email || 'No email'}</span>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            {/* Balance Section - Right */}
+            <div className="text-right">
+              <div className="text-2xl font-bold mb-1">
+                {balance === 0 ? (
+                  <span className="text-gray-600">$0.00</span>
+                ) : balance > 0 ? (
+                  <span className="text-green-600">
+                    +${balance.toFixed(2)}
+                  </span>
+                ) : (
+                  <span className="text-red-600">
+                    -${Math.abs(balance).toFixed(2)}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-1">
+                {balance === 0 ? (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-xs font-medium">All settled</span>
+                  </div>
+                ) : balance > 0 ? (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                    </svg>
+                    <span className="text-xs font-medium">You're owed</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-red-600">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                    </svg>
+                    <span className="text-xs font-medium">You owe</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tabs Section */}
-      <div className="mb-4">
-        <Card className="shadow-lg border-0 bg-white">
-          <CardContent className="p-6">
-            <Tabs
-              defaultValue="expenses"
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="expenses" className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  Expenses ({expenses.length})
-                </TabsTrigger>
-                <TabsTrigger value="settlements" className="flex items-center gap-2">
-                  <ArrowRightLeft className="w-4 h-4" />
-                  Settlements ({settlements.length})
-                </TabsTrigger>
-              </TabsList>
+              <Card className={`shadow-lg border border-gray-200 ${activeTab === 'expenses' ? (balance === 0 ? 'bg-gradient-to-br from-gray-50 to-slate-50' : balance > 0 ? 'bg-gradient-to-br from-white to-emerald-50' : 'bg-gradient-to-br from-white to-rose-50') : 'bg-gradient-to-br from-blue-50 to-indigo-50'}`}>
+        <CardContent className="p-6">
+          <Tabs
+            defaultValue="expenses"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="expenses" className={`flex items-center gap-2 ${balance === 0 ? 'data-[state=active]:bg-gray-100 data-[state=active]:text-gray-700' : balance > 0 ? 'data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-700' : 'data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Expenses ({expenses.length})
+              </TabsTrigger>
+                              <TabsTrigger value="settlements" className="flex items-center gap-2 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700">
+                <ArrowRightLeft className="w-4 h-4" />
+                Settlements ({settlements.length})
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="expenses" className="space-y-4">
-                <ExpenseList 
-                  expenses={expenses} 
-                  showOtherPerson={false} 
-                  otherUserId={params.id as string} 
-                  userLookUpMap={{
-                    [otherUser.id]: otherUser,
-                    [currentUser?._id || '']: currentUser
-                  }} 
-                />
-              </TabsContent>
-              <TabsContent value="settlements" className="space-y-4">
-                <SettlementsList 
-                  settlements={settlements} 
-                  userLookUpMap={{[otherUser.id]: otherUser}}
-                />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+            <TabsContent value="expenses" className="space-y-4">
+              <ExpenseList 
+                expenses={expenses} 
+                showOtherPerson={false} 
+                otherUserId={params.id as string} 
+                userLookUpMap={{
+                  [otherUser.id]: otherUser,
+                  [currentUser?._id || '']: currentUser
+                }} 
+              />
+            </TabsContent>
+            <TabsContent value="settlements" className="space-y-4">
+              <SettlementsList 
+                settlements={settlements} 
+                userLookUpMap={{[otherUser.id]: otherUser}}
+              />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
