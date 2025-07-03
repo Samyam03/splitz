@@ -86,6 +86,31 @@ export const getGroupExpenses = query({
         settlement.amount;
     }
 
+    //if a has to pay b, and b has to pay a, we do not want two different entries we want to merge them into one
+
+    ids.forEach(a=>{
+      ids.forEach(b=>{
+         if(a >=b){
+          return;
+         }
+
+         const diff = ledger[a][b] -ledger[b][a];
+
+         if(diff>0){
+          ledger[a][b] = diff;
+          ledger[b][a] = 0;
+         }
+         else if(diff<0){
+           ledger[b][a] = -diff;
+           ledger[a][b] = 0;
+         }
+         else{
+          ledger[a][b] = 0;
+          ledger[b][a] = 0;
+         }
+      })
+    })
+
     const balances = memberDetails.map((member) => ({
       ...member,
       totalBalance: totals[member.id],

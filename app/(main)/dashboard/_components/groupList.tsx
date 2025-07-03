@@ -28,7 +28,7 @@ const GroupList = ({ groups }: GroupListProps) => {
                 const hasBalance = balance !== 0;
                 
                 return (
-                    <Link key={group.id} href={`/group/${group.id}`} className="block group">
+                    <Link key={group.id} href={`/groups/${group.id}`} className="block group">
                         <div className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-blue-50/60 hover:from-blue-50 hover:to-indigo-50 rounded-xl border border-blue-200/50 hover:border-blue-300/70 p-4 group-hover:scale-[1.02]">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3 min-w-0 flex-1">

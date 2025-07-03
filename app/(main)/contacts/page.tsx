@@ -180,7 +180,7 @@ export default function ContactsPage() {
                 ) : (
                   <div className="space-y-3">
                     {groups.map((group: any) => (
-                      <Link key={group.id} href={`/group/${group.id}`} className="block">
+                      <Link key={group.id} href={`/groups/${group.id}`} className="block">
                         <Card className="hover:shadow-md transition-all duration-200 border-0 bg-white hover:bg-gradient-to-r hover:from-white hover:to-orange-50">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-4">
@@ -210,7 +210,7 @@ export default function ContactsPage() {
           isClose={()=>setIsNewGroupModalOpen(false)}
           onSuccess={(groupId: string) => {
             setIsNewGroupModalOpen(false);
-            router.push(`/group/${groupId}`);
+            router.push(`/groups/${groupId}`);
           }}
         />
       </div>
