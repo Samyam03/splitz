@@ -141,3 +141,68 @@ export const deleteExpense = mutation({
         return {success:true}
     }
 })
+
+export const createExpense = mutation({
+  args: {
+    description: v.string(),
+    amount: v.number(),
+    date: v.number(),
+    category: v.optional(v.string()),
+    paidByUserId: v.id("users"),
+    splitType:v.string(),
+    splits: v.array(
+      v.object({
+        userId: v.id("users"),
+        amount: v.number(),
+        paid: v.boolean(),
+      })
+    ),
+    groupId: v.optional(v.id("groups")),
+  },
+    handler: async (ctx, args): Promise<{ success: boolean; expenseId: Id<"expenses"> }> => {
+     const user: Doc<"users"> | null = await ctx.runQuery(internal.users.getCurrentUser);
+
+     if (!user) {
+       throw new Error("User not found or not authenticated");
+     }
+
+     if(args.groupId){
+      const group = await ctx.db.get(args.groupId);
+      if(!group){
+        throw new Error("Group not found");
+      }
+      
+      const isMember = group.members.some(
+        (member) => member.userId === user._id
+      );
+      if(!isMember){
+        throw new Error("You are not a member of this group");
+      }
+    }
+      
+      const totalSplitAmount = args.splits.reduce(
+        (sum, split) => sum + split.amount,0
+      )
+
+      const tolerance = 0.01;
+      if(Math.abs(totalSplitAmount - args.amount) > tolerance){
+        throw new Error("The total split amount does not match the expense amount");
+       }
+
+      const expenseId: Id<"expenses"> = await ctx.db.insert("expenses", {
+        description: args.description,
+        amount: args.amount,
+        date: args.date,
+        category: args.category,
+        paidByUserId: args.paidByUserId,
+        splitType: args.splitType,
+        splits: args.splits,
+        groupId: args.groupId,
+        createdBy: user._id,
+      })
+
+      return {success: true, expenseId}
+      }
+     
+  
+})
