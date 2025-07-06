@@ -2,8 +2,6 @@ import { useConvexQuery } from '@/hooks/useConvexQuery';
 import { api } from "@/convex/_generated/api";
 import React, { useEffect, useState } from 'react'
 import { BarLoader } from 'react-spinners';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users } from 'lucide-react';
 
 type GroupMember = {
   id: string;
@@ -48,31 +46,25 @@ const GroupSelector = ({onChange}: {onChange: (group: Group) => void}) => {
 
   return (
     <div>
-      <Select value={selectedGroupId} onValueChange={handleGroupChange} >
-        <SelectTrigger>
-          <SelectValue placeholder="Select a group" />
-        </SelectTrigger>
-                 <SelectContent>
-           {data.groups.map((group: {id: string; name: string; memberCount: number})=> (
-             <SelectItem key={group.id} value={group.id}>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>{group.name}</span>
-                <span className="text-sm text-gray-500">
-                  ({group.memberCount} members)
-                </span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>   
+      <select 
+        value={selectedGroupId} 
+        onChange={(e) => handleGroupChange(e.target.value)}
+        className="w-full h-12 px-4 py-3 text-sm border rounded-md focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 bg-white/80 border-purple-200 font-medium"
+      >
+        <option value="">Select a group</option>
+        {data.groups.map((group: {id: string; name: string; memberCount: number}) => (
+          <option key={group.id} value={group.id}>
+            {group.name} ({group.memberCount} members)
+          </option>
+        ))}
+      </select>
 
       {loading && selectedGroupId && (
         <div className="flex items-center gap-2 mt-2">
-          <BarLoader/>
-          <span className="text-sm text-gray-600">Loading group members...</span>
+          <BarLoader height={2} width={50} />
+          <span className="text-sm text-gray-600 font-medium">Loading group members...</span>
         </div>
-      ) }
+      )}
     </div>
   )
 }

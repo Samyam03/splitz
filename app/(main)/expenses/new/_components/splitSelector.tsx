@@ -4,7 +4,9 @@ import { useUser } from '@clerk/nextjs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { getUserColor } from '@/lib/userColors';
 
 interface Participant {
   id: string;
@@ -44,8 +46,13 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
   const [totalAmount, setTotalAmount] = useState(0)
 
   useEffect(() => {
-    if (!amount || amount <= 0 || participants.length === 0) {
+    // Validate inputs first
+    const validAmount = !isNaN(amount) && amount > 0;
+    
+    if (!validAmount || participants.length === 0) {
       setSplits([])
+      setTotalAmount(0)
+      setTotalPercentage(0)
       onSplitChange([])
       return
     }
@@ -89,11 +96,9 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
 
     setSplits(newSplits)
     
-    
     // Calculate totals
     const totalAmt = newSplits.reduce((sum, split) => sum + split.amount, 0)
     const totalPercentage = newSplits.reduce((sum, split) => sum + split.percentage, 0)
-
 
     setTotalAmount(totalAmt)
     setTotalPercentage(totalPercentage)
@@ -102,6 +107,12 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
   }, [type, amount, participants, paidByUserId, onSplitChange])
 
   const updatePercentageSplit = (userId: string, percentage: number) => {
+    // Validate inputs
+    const validAmount = !isNaN(amount) && amount > 0;
+    const validPercentage = !isNaN(percentage) && percentage >= 0 && percentage <= 100;
+    
+    if (!validAmount || !validPercentage) return;
+
     const updatedSplits = splits.map(split => {
       if (split.userId === userId) {
         return {
@@ -116,7 +127,6 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
     const totalAmt = updatedSplits.reduce((sum, split) => sum + split.amount, 0)
     const totalPercentage = updatedSplits.reduce((sum, split) => sum + split.percentage, 0)
 
-
     setTotalAmount(totalAmt)
     setTotalPercentage(totalPercentage)
 
@@ -124,11 +134,14 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
   }
 
   const updateExactSplit = (userId: string, newAmount: string) => {
-    const parsedAmount = parseFloat(newAmount)||0
+    const parsedAmount = parseFloat(newAmount) || 0
+    const validAmount = !isNaN(amount) && amount > 0;
     
-    const updatedSplits = splits.map((split)=>{
-      if(split.userId === userId){
-        return{
+    if (!validAmount) return;
+    
+    const updatedSplits = splits.map((split) => {
+      if (split.userId === userId) {
+        return {
           ...split,
           amount: parsedAmount,
           percentage: (parsedAmount / amount) * 100
@@ -148,94 +161,180 @@ const SplitSelector: React.FC<SplitSelectorProps> = ({
     onSplitChange(updatedSplits)
   }
 
-  const isPercentageValid = Math.abs(totalPercentage - 100) < 0.01
-  const isAmountValid = Math.abs(totalAmount - amount) < 0.01
+  // Enhanced validation logic
+  const validAmount = !isNaN(amount) && amount > 0;
+  const hasValidSplits = splits.length > 0 && validAmount;
+  const isPercentageValid = hasValidSplits && Math.abs(totalPercentage - 100) < 0.01
+  const isAmountValid = hasValidSplits && Math.abs(totalAmount - amount) < 0.01
+
+  // Don't render anything if amount is invalid
+  if (!validAmount || participants.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 text-center">
+          <p className="text-sm text-gray-500">
+            {!validAmount ? "Enter a valid amount to configure splits" : "Add participants to configure splits"}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3">
-        {splits.map((split, index) => (
-          <div key={split.userId || `split-${index}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarImage src={split.imageUrl} />
-                <AvatarFallback>{split.name.charAt(0)}</AvatarFallback>           
-              </Avatar>
-                           <span>
-               {split.userId === user?.id ? "You" : split.name}
-              </span>
-             </div>
+      <div className="space-y-3">
+        {splits.map((split, index) => {
+          const userColor = getUserColor(split.userId);
+          const isCurrentUser = split.userId === user?.id;
+          
+          return (
+            <Card key={split.userId || `split-${index}`} className="border-0 bg-gradient-to-r from-white to-gray-50/50 shadow-sm hover:shadow-md transition-all duration-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className={`h-8 w-8 ring-2 ${userColor.ring}`}>
+                      <AvatarImage src={split.imageUrl} />
+                      <AvatarFallback className={`font-semibold text-sm ${userColor.bg} ${userColor.text}`}>
+                        {split.name.charAt(0)}
+                      </AvatarFallback>           
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-800 text-sm">
+                        {isCurrentUser ? "You" : split.name}
+                      </span>
+                      {split.paid && (
+                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 border-green-200">
+                          Paid
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
 
-             {type === "equal" && (
-              <div className="flex items-center space-x-2">
-                ${split.amount.toFixed(2)} ({split.percentage.toFixed(1)}%)
-              </div>
-             )}
+                  <div className="flex items-center gap-4">
+                    {type === "equal" && (
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-800">
+                          ${split.amount.toFixed(2)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {split.percentage.toFixed(1)}%
+                        </div>
+                      </div>
+                    )}
 
-             {type ==="percentage" &&(
-              <div>
-                                 <Slider value={[split.percentage]} min={0} max={100} step={1} onValueChange={(value)=>updatePercentageSplit(split.userId, value[0])} />
-                
-                <div>
-                  <Input type="number" min="0" max="100" value={split.percentage.toFixed(1)} onChange={(e)=>updatePercentageSplit(split.userId, parseFloat(e.target.value))}/>
-                
-                <span>
-                  %
-                </span>
+                    {type === "percentage" && (
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-[120px]">
+                          <Slider 
+                            value={[split.percentage]} 
+                            min={0} 
+                            max={100} 
+                            step={1} 
+                            onValueChange={(value) => updatePercentageSplit(split.userId, value[0])}
+                            className="w-full" 
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            max="100" 
+                            value={split.percentage.toFixed(1)} 
+                            onChange={(e) => updatePercentageSplit(split.userId, parseFloat(e.target.value))}
+                            className="w-16 h-8 text-center text-sm"
+                          />
+                          <span className="text-sm text-gray-500">%</span>
+                        </div>
+                        <div className="text-right min-w-[70px]">
+                          <div className="text-lg font-bold text-gray-800">
+                            ${split.amount.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                <span>
-                  ${split.amount.toFixed(2)}
-                </span>
-                
+                    {type === "exact" && (
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">$</span>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            max={amount * 2} 
+                            step="0.01" 
+                            value={split.amount.toFixed(2)} 
+                            onChange={(e) => updateExactSplit(split.userId, e.target.value)}
+                            className="w-20 h-8 text-center text-sm"
+                          />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-500">
+                            {split.percentage.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-             )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-             {type === "exact" && (
-              <div>
-                <div>
-                </div>
-                <div>
-                  <span> $</span>
-                    <Input type="number" min="0" max={amount*2} step="0.01" value={split.amount.toFixed(2)} onChange={(e)=>updateExactSplit(split.userId, e.target.value)}/>
-                  <span>
-                    {split.percentage.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-             )}
-           </div>
-         ))}
-         <div>
-          <span>
-            Total
-          </span>
-          <div>
-            <span className={`${isAmountValid ? "text-green-500" : "text-red-500"}`}>
-              ${totalAmount.toFixed(2)}
+      {/* Total Summary */}
+      <div className={`bg-gradient-to-r rounded-lg border p-3 ${
+        isAmountValid 
+          ? 'from-blue-50 to-indigo-50 border-blue-200' 
+          : 'from-amber-50 to-orange-50 border-amber-200'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-700">
+              Total
             </span>
-            {type!=="equal" &&(
-              <span>
-                ({totalPercentage.toFixed(1)}%)
-              </span>
+            {isAmountValid && (
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            )}
+            {!isAmountValid && (
+              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
             )}
           </div>
-         </div>
-
-         {type ==="percentage" && !isPercentageValid &&(
-          <div>
-            The percentage does not add up to 100%
+          <div className="text-right">
+            <div className={`text-lg font-bold ${
+              isAmountValid ? "text-blue-600" : "text-amber-600"
+            }`}>
+              ${totalAmount.toFixed(2)}
+            </div>
+            {type !== "equal" && (
+              <div className={`text-xs ${
+                isPercentageValid ? "text-blue-500" : "text-amber-500"
+              }`}>
+                ({totalPercentage.toFixed(1)}%)
+              </div>
+            )}
           </div>
-         )}
-
-         {type === "exact" && !isAmountValid &&(
-          <div>
-            The sum of these amount does not match the total amount of (${amount.toFixed(2)})
-          </div>
-         )}
+        </div>
       </div>
-      
-      
+
+      {/* Validation Messages */}
+      {hasValidSplits && type === "percentage" && !isPercentageValid && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-3">
+          <p className="text-sm text-amber-700 flex items-center gap-2">
+            <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+            The percentage does not add up to 100% (currently {totalPercentage.toFixed(1)}%)
+          </p>
+        </div>
+      )}
+
+      {hasValidSplits && type === "exact" && !isAmountValid && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-3">
+          <p className="text-sm text-amber-700 flex items-center gap-2">
+            <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+            The sum of these amounts (${totalAmount.toFixed(2)}) does not match the total amount of ${amount.toFixed(2)}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
