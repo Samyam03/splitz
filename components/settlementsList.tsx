@@ -65,9 +65,9 @@ const SettlementsList = ({
     <div className="space-y-4">
       {settlements.map((settlement, index)=>{
         const payer = getUserDetails(settlement.paidByUserId)
-        const receiver = getUserDetails(settlement.receiverId)
+        const receiver = getUserDetails(settlement.receivedByUserId)
         const isCurrentUserPayer = settlement.paidByUserId === currentUser.data?._id
-        const isCurrentUserReceiver = settlement.receiverId === currentUser.data?._id
+        const isCurrentUserReceiver = settlement.receivedByUserId === currentUser.data?._id
 
         return(
           <Card key={settlement.id || `settlement-${index}`} className="shadow-lg border border-gray-200 bg-gradient-to-br from-white to-blue-50 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"> 

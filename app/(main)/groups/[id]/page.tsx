@@ -67,7 +67,7 @@ const GroupPage = () => {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" asChild className="flex items-center gap-2 hover:bg-indigo-50 border-indigo-200 hover:border-indigo-300 transition-colors">
-            <Link href={`/settlements/user/${params.id}`}>
+            <Link href={`/settlements/group/${params.id}`}>
               <ArrowRightLeft className="h-4 w-4" />
               Settle Up
             </Link>
