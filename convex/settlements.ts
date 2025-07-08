@@ -144,11 +144,11 @@ export const getSettlementData = query({
             // Apply settlements correctly
             for(const settlement of settlements){
                 if(settlement.paidByUserId === myData._id){
-                    // I paid them, so they owe me less
-                    owed = Math.max(0, owed - settlement.amount);
-                } else {
-                    // They paid me, so I owe them less
+                    // I paid them, so I owe them less
                     owedTo = Math.max(0, owedTo - settlement.amount);
+                } else {
+                    // They paid me, so they owe me less
+                    owed = Math.max(0, owed - settlement.amount);
                 }
             }
 
@@ -210,12 +210,12 @@ export const getSettlementData = query({
 
             for(const settlement of settlements){
                 if(settlement.paidByUserId === myData._id && balances[settlement.receivedByUserId]){
-                    // I paid them, so they owe me less
-                    balances[settlement.receivedByUserId].owed = Math.max(0, balances[settlement.receivedByUserId].owed - settlement.amount);
+                    // I paid them, so I owe them less
+                    balances[settlement.receivedByUserId].owedTo = Math.max(0, balances[settlement.receivedByUserId].owedTo - settlement.amount);
                 }
                 if(settlement.receivedByUserId === myData._id && balances[settlement.paidByUserId]){
-                    // They paid me, so I owe them less
-                    balances[settlement.paidByUserId].owedTo = Math.max(0, balances[settlement.paidByUserId].owedTo - settlement.amount);
+                    // They paid me, so they owe me less
+                    balances[settlement.paidByUserId].owed = Math.max(0, balances[settlement.paidByUserId].owed - settlement.amount);
                 }
             }
 
