@@ -124,8 +124,8 @@ export const getSettlementData = query({
             
             const expenses = [...myExpenses, ...otherExpenses];
 
-            let owed = 0;
-            let owedTo = 0;
+            // Calculate net balance like in getExpensesBetweenUsers
+            let balance = 0;
 
             for(const expense of expenses){
                 const involvesMe = expense.paidByUserId === myData._id || expense.splits.some((s)=> s.userId === myData._id);
@@ -136,14 +136,14 @@ export const getSettlementData = query({
                 if(expense.paidByUserId === myData._id){
                     const split = expense.splits.find((s)=> s.userId === otherUserId&&!s.paid);
                     if(split){
-                        owed += split.amount;
+                        balance += split.amount;
                     }
                     
                 }
                 if(expense.paidByUserId === otherUserId){
                     const split = expense.splits.find((s)=> s.userId === myData._id&&!s.paid);
                     if(split){
-                        owedTo += split.amount;
+                        balance -= split.amount;
                     }
                 }
             }
@@ -168,16 +168,18 @@ export const getSettlementData = query({
                 )
                 .collect();
 
-            // Apply settlements correctly
+            // Apply settlements the same way as getExpensesBetweenUsers
             for(const settlement of settlements){
                 if(settlement.paidByUserId === myData._id){
-                    // I paid them, so I owe them less
-                    owedTo = Math.max(0, owedTo - settlement.amount);
+                    balance += settlement.amount;
                 } else {
-                    // They paid me, so they owe me less
-                    owed = Math.max(0, owed - settlement.amount);
+                    balance -= settlement.amount;
                 }
             }
+
+            // Convert balance to owed/owedTo format
+            const owed = Math.max(0, balance);
+            const owedTo = Math.max(0, -balance);
 
             const otherUser = other as any;
             return {
@@ -190,7 +192,7 @@ export const getSettlementData = query({
                 },
                 youAreOwed: owed,
                 youOwe: owedTo,
-                netBalance: owed - owedTo,
+                netBalance: balance,
             };
         } else if(args.entityType === "group"){
             const group: any = await ctx.db.get(args.entityid as any);
@@ -209,7 +211,7 @@ export const getSettlementData = query({
             const balances: any = {};
 
             group.members.forEach((member: any) => {
-                balances[member.userId] = {owed: 0, owedTo: 0};
+                balances[member.userId] = {balance: 0};
             });
 
             for(const expense of expenses){
@@ -217,7 +219,7 @@ export const getSettlementData = query({
                     expense.splits.forEach((split: any) => {
                         if(split.userId !== myData._id && !split.paid){
                             if(balances[split.userId]){
-                                balances[split.userId].owed += split.amount;
+                                balances[split.userId].balance += split.amount;
                             }
                         }
                     });
@@ -225,7 +227,7 @@ export const getSettlementData = query({
                 else if(balances[expense.paidByUserId]){
                     const split = expense.splits.find((s: any) => s.userId === myData._id && !s.paid);
                     if(split){
-                        balances[expense.paidByUserId].owedTo += split.amount;
+                        balances[expense.paidByUserId].balance -= split.amount;
                     }
                 }
             }
@@ -237,12 +239,10 @@ export const getSettlementData = query({
 
             for(const settlement of settlements){
                 if(settlement.paidByUserId === myData._id && balances[settlement.receivedByUserId]){
-                    // I paid them, so I owe them less
-                    balances[settlement.receivedByUserId].owedTo = Math.max(0, balances[settlement.receivedByUserId].owedTo - settlement.amount);
+                    balances[settlement.receivedByUserId].balance += settlement.amount;
                 }
                 if(settlement.receivedByUserId === myData._id && balances[settlement.paidByUserId]){
-                    // They paid me, so they owe me less
-                    balances[settlement.paidByUserId].owed = Math.max(0, balances[settlement.paidByUserId].owed - settlement.amount);
+                    balances[settlement.paidByUserId].balance -= settlement.amount;
                 }
             }
 
@@ -250,14 +250,15 @@ export const getSettlementData = query({
 
             const list = Object.keys(balances).map((id)=> {
                 const member: any = members.find((user:any)=> user._id === id);
+                const balance = balances[id].balance;
                 return {
                     userId: id,
                     name: member?.name || "",
                     imageUrl: member?.imageUrl,
                     email: member?.email,
-                    youAreOwed: balances[id].owed,
-                    youOwe: balances[id].owedTo,
-                    netBalance: balances[id].owed - balances[id].owedTo,
+                    youAreOwed: Math.max(0, balance),
+                    youOwe: Math.max(0, -balance),
+                    netBalance: balance,
                 };
             });
             return {
