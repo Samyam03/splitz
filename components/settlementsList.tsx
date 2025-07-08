@@ -1,10 +1,12 @@
 import { api } from '@/convex/_generated/api'
-import { useConvexQuery } from '@/hooks/useConvexQuery'
-import React from 'react'
+import { useConvexQuery, useConvexMutation } from '@/hooks/useConvexQuery'
+import React, { useState } from 'react'
 import { Card, CardContent } from './ui/card'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeft, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { toast } from 'sonner'
 
 interface Expense {
   id: string
@@ -34,6 +36,8 @@ const SettlementsList = ({
 }: SettlementsListProps) => {
 
   const currentUser = useConvexQuery(api.users.getUser)
+  const deleteSettlement = useConvexMutation(api.settlements.deleteSettlement)
+  const [deletingSettlements, setDeletingSettlements] = useState<Set<string>>(new Set())
 
   if(!settlements || !settlements.length){
     return(
@@ -58,8 +62,36 @@ const SettlementsList = ({
       id: userId,
       imageUrl: userLookUpMap[userId]?.imageUrl || ""
     }
+  }
 
-}
+  const canDeleteSettlement = (settlement: any) => {
+    if (!currentUser.data?._id) return false
+    return (
+      settlement.createdBy === currentUser.data._id ||
+      settlement.paidByUserId === currentUser.data._id
+    )
+  }
+
+  const handleDeleteSettlement = async (settlementId: string) => {
+    if (!confirm('Are you sure you want to delete this settlement? This action cannot be undone.')) {
+      return
+    }
+
+    setDeletingSettlements(prev => new Set(prev).add(settlementId))
+    
+    try {
+      await deleteSettlement.mutate({ settlementId: settlementId as any })
+      toast.success('Settlement deleted successfully!')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete settlement')
+    } finally {
+      setDeletingSettlements(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(settlementId)
+        return newSet
+      })
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -93,11 +125,11 @@ const SettlementsList = ({
                   </div>
                 </div>
                 
-                                  <div className="flex flex-col items-end gap-3">
-                    <div className="text-right">
-                      <div className={`text-2xl font-bold ${isCurrentUserPayer ? 'text-blue-600' : isCurrentUserReceiver ? 'text-blue-500' : 'text-blue-400'}`}>
-                        ${settlement.amount.toFixed(2)}
-                      </div>
+                <div className="flex flex-col items-end gap-3">
+                  <div className="text-right">
+                    <div className={`text-2xl font-bold ${isCurrentUserPayer ? 'text-blue-600' : isCurrentUserReceiver ? 'text-blue-500' : 'text-blue-400'}`}>
+                      ${settlement.amount.toFixed(2)}
+                    </div>
                     {isGroupSettlement ?(
                       <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200">
                         Group Settlement
@@ -129,6 +161,23 @@ const SettlementsList = ({
                       </div>
                     )}
                   </div>
+                  
+                  {/* Delete Button */}
+                  {canDeleteSettlement(settlement) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteSettlement(settlement._id || settlement.id)}
+                      disabled={deletingSettlements.has(settlement._id || settlement.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-8 px-3"
+                    >
+                      {deletingSettlements.has(settlement._id || settlement.id) ? (
+                        <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3 h-3" />
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>

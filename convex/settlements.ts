@@ -72,6 +72,33 @@ export const createSettlement = mutation({
   },
 }); 
 
+export const deleteSettlement = mutation({
+    args: {
+        settlementId: v.id("settlements"),
+    },
+    handler: async (ctx, { settlementId }) => {
+        const user = await ctx.runQuery(internal.users.getCurrentUser);
+
+        if (!user) {
+            throw new Error("User not found or not authenticated");
+        }
+
+        const settlement = await ctx.db.get(settlementId);
+
+        if (!settlement) {
+            throw new Error("Settlement not found");
+        }
+
+        // Only allow the payer or creator to delete the settlement
+        if (settlement.createdBy !== user._id && settlement.paidByUserId !== user._id) {
+            throw new Error("You are not authorized to delete this settlement");
+        }
+
+        await ctx.db.delete(settlementId);
+        return { success: true }
+    }
+});
+
 export const getSettlementData = query({
     args: {
         entityType: v.string(),
