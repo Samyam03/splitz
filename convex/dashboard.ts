@@ -32,7 +32,6 @@ export const getUserBalances = query({
     handler: async (ctx) => {
         const user = await ctx.runQuery(internal.users.getCurrentUser)
 
-        // In getUserBalances
         if (!user) {
             return {
                 youOwe: 0,
@@ -42,87 +41,96 @@ export const getUserBalances = query({
             };
         }
 
+        // Get all non-group expenses involving the user
         const expenses = (await ctx.db.query("expenses").collect()).filter(
             (expense) => !expense.groupId && (expense.paidByUserId === user._id ||
                 expense.splits.some((split) => split.userId === user._id)
             )
         )
 
-        let youOwe = 0;
-        let youAreOwed = 0;
-        const balanceByUser: Record<string, UserBalance> = {}
-
-
-        for (const expense of expenses) {
-            const isPayer = expense.paidByUserId === user._id;
-            const mySplit = expense.splits.find((split) => split.userId === user._id);
-
-            if (isPayer) {
-                for (const split of expense.splits) {
-                    if (split.userId === user._id || split.paid) {
-                        continue;
-                    }
-
-                    youAreOwed += split.amount;
-
-                    balanceByUser[split.userId] ??= { owed: 0, owedTo: 0 };
-                    balanceByUser[split.userId].owed += split.amount;
-
-                }
-            }
-            else if (mySplit && !mySplit.paid) {
-                youOwe += mySplit.amount;
-
-                balanceByUser[expense.paidByUserId] ??= { owed: 0, owedTo: 0 };
-                balanceByUser[expense.paidByUserId].owedTo += mySplit.amount;
-            }
-        }
-
+        // Get all non-group settlements involving the user
         const settlements = (await ctx.db.query("settlements").collect()).filter(
             (settlement) => !settlement.groupId && (settlement.paidByUserId === user._id || settlement.receivedByUserId === user._id)
         )
 
-        for (const settlement of settlements) {
-            if (settlement.paidByUserId === user._id) {
-                youOwe -= settlement.amount;
-                balanceByUser[settlement.receivedByUserId] ??= { owed: 0, owedTo: 0 };
-                balanceByUser[settlement.receivedByUserId].owedTo -= settlement.amount;
+        // Calculate individual balances with each user (like getExpensesBetweenUsers)
+        const balanceByUser: Record<string, number> = {}
+
+        // Process expenses
+        for (const expense of expenses) {
+            const otherUserIds = new Set<string>()
+            
+            // Find all other users involved in this expense
+            if (expense.paidByUserId !== user._id) {
+                otherUserIds.add(expense.paidByUserId)
             }
-            else if (settlement.receivedByUserId === user._id) {
-                youAreOwed -= settlement.amount;
-                balanceByUser[settlement.paidByUserId] ??= { owed: 0, owedTo: 0 };
-                balanceByUser[settlement.paidByUserId].owed -= settlement.amount;
+            expense.splits.forEach(split => {
+                if (split.userId !== user._id) {
+                    otherUserIds.add(split.userId)
+                }
+            })
+
+            // Calculate balance with each other user for this expense
+            for (const otherUserId of otherUserIds) {
+                balanceByUser[otherUserId] ??= 0
+
+                if (expense.paidByUserId === user._id) {
+                    // I paid, they owe me
+                    const split = expense.splits.find(s => s.userId === otherUserId && !s.paid)
+                    if (split) {
+                        balanceByUser[otherUserId] += split.amount
+                    }
+                } else if (expense.paidByUserId === otherUserId) {
+                    // They paid, I owe them
+                    const split = expense.splits.find(s => s.userId === user._id && !s.paid)
+                    if (split) {
+                        balanceByUser[otherUserId] -= split.amount
+                    }
+                }
             }
         }
 
+        // Process settlements
+        for (const settlement of settlements) {
+            if (settlement.paidByUserId === user._id) {
+                // I paid them
+                balanceByUser[settlement.receivedByUserId] ??= 0
+                balanceByUser[settlement.receivedByUserId] += settlement.amount
+            } else {
+                // They paid me
+                balanceByUser[settlement.paidByUserId] ??= 0
+                balanceByUser[settlement.paidByUserId] -= settlement.amount
+            }
+        }
+
+        // Calculate totals and lists
+        let youOwe = 0
+        let youAreOwed = 0
         const youOweList: BalanceDetails[] = []
         const youAreOwedList: BalanceDetails[] = []
 
         for (const [uid, balance] of Object.entries(balanceByUser)) {
-            const { owed, owedTo } = balance as { owed: number, owedTo: number };
-            const net = owed - owedTo;
-            if (net === 0) {
-                continue;
-            }
+            if (balance === 0) continue
 
             const counterpart = await ctx.db.get(uid as Id<"users">)
             const base = {
                 userId: uid,
                 name: counterpart?.name || "",
                 imageUrl: counterpart?.imageUrl,
-                amount: Math.abs(net),
+                amount: Math.abs(balance),
             }
 
-            if (net > 0) {
+            if (balance > 0) {
+                youAreOwed += balance
                 youAreOwedList.push(base)
             } else {
+                youOwe += Math.abs(balance)
                 youOweList.push(base)
             }
         }
 
         youOweList.sort((a, b) => b.amount - a.amount)
         youAreOwedList.sort((a, b) => b.amount - a.amount)
-
 
         return {
             youOwe,

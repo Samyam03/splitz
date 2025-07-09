@@ -65,16 +65,18 @@ const DashboardPage = () => {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {/* Total Balance Card */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold text-gray-700">
-                  Total Balance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-3xl font-bold">
+          {/* Combined Balance Card */}
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-white via-slate-50 to-gray-100 overflow-hidden">
+            <CardContent className="p-5">
+              {/* Upper Section - Total Balance */}
+              <div className="text-center mb-5 pb-4 border-b border-gray-200">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-3 shadow-md">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Total Balance</h3>
+                <div className="text-3xl font-bold mb-2">
                   {balances?.totalBalance > 0 ? (
                     <span className="text-green-600">
                       +${balances.totalBalance.toFixed(2)}
@@ -87,67 +89,94 @@ const DashboardPage = () => {
                     <span className="text-gray-600">$0.00</span>
                   )}
                 </div>
-
-                <p className="text-sm font-medium text-gray-600">
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  balances?.totalBalance > 0 
+                    ? "bg-green-100 text-green-700 border border-green-200" 
+                    : balances?.totalBalance < 0 
+                      ? "bg-red-100 text-red-700 border border-red-200"
+                      : "bg-gray-100 text-gray-700 border border-gray-200"
+                }`}>
+                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                    balances?.totalBalance > 0 
+                      ? "bg-green-500" 
+                      : balances?.totalBalance < 0 
+                        ? "bg-red-500"
+                        : "bg-gray-500"
+                  }`}></div>
                   {balances?.totalBalance > 0
                     ? "You are owed money"
                     : balances?.totalBalance < 0
                       ? "You owe money"
                       : "All settled up"}
-                </p>
-              </CardContent>
-            </Card>
+                </div>
+              </div>
 
-            {/* You Are Owed Card */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold text-gray-700">
-                  You Are Owed
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-3xl font-bold text-green-600">
-                  ${balances?.youAreOwed?.toFixed(2) || "0.00"}
+              {/* Lower Section - You Are Owed (Left) and You Owe (Right) */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Left - You Are Owed */}
+                <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-xl p-4 border border-green-200/50 shadow-sm hover:shadow-md transition-all duration-300 group">
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-bold text-green-800 mb-2 text-center">You Are Owed</h4>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-green-700 mb-1">
+                      ${balances?.youAreOwed?.toFixed(2) || "0.00"}
+                    </div>
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-200/70 text-green-800 text-xs font-medium">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      From {balances?.oweDetails?.youAreOwed?.length || 0}
+                    </div>
+                  </div>
                 </div>
 
-                <p className="text-sm font-medium text-gray-600">
-                  From {balances?.oweDetails?.youAreOwed?.length || 0} people
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* You Owe Card */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-red-50 to-rose-50 md:col-span-2 lg:col-span-1">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold text-gray-700">
-                  You Owe
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  {balances?.oweDetails?.youOwe?.length > 0 ? (
-                    <>
-                      <div className="text-3xl font-bold text-red-600">
-                        ${balances?.youOwe?.toFixed(2) || "0.00"}
-                      </div>
-                      <p className="text-sm font-medium text-gray-600 mt-2">
-                        To {balances?.oweDetails.youOwe.length || 0} people
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="text-3xl font-bold text-gray-600">
-                        $0.00
-                      </div>
-                      <p className="text-sm font-medium text-green-600 mt-2">
-                        You don't owe anyone money
-                      </p>
-                    </>
-                  )}
+                {/* Right - You Owe */}
+                <div className="bg-gradient-to-br from-red-50 via-rose-50 to-red-100 rounded-xl p-4 border border-red-200/50 shadow-sm hover:shadow-md transition-all duration-300 group">
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-bold text-red-800 mb-2 text-center">You Owe</h4>
+                  <div className="text-center">
+                    {balances?.oweDetails?.youOwe?.length > 0 ? (
+                      <>
+                        <div className="text-xl font-bold text-red-700 mb-1">
+                          ${balances?.youOwe?.toFixed(2) || "0.00"}
+                        </div>
+                        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-200/70 text-red-800 text-xs font-medium">
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          To {balances?.oweDetails.youOwe.length || 0}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-xl font-bold text-gray-600 mb-1">
+                          $0.00
+                        </div>
+                        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-200/70 text-gray-700 text-xs font-medium">
+                          <svg className="w-3 h-3 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          No debts
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Main Content Grid - Equal Heights */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
