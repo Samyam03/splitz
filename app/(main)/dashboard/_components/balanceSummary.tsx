@@ -25,31 +25,27 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
     const hasOwing = Array.isArray(youOwe) && youOwe.length > 0;
 
   return (  
-    <div className="space-y-4 h-full">
+    <div className="space-y-4">
       {!hasOwed && !hasOwing && (
-        <div className="text-center py-8 space-y-3 flex flex-col justify-center h-full">
-          <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-            <ArrowUp className="w-5 h-5 text-white" />
+        <div className="text-center py-8">
+          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <ArrowUp className="w-6 h-6 text-green-600" />
           </div>
-          <div>
-            <p className="text-gray-700 font-semibold text-sm">All settled up!</p>
-            <p className="text-xs text-gray-500 mt-1">You don't owe anyone and nobody owes you</p>
-          </div>
+          <p className="text-gray-700 font-medium">All settled up!</p>
+          <p className="text-sm text-gray-500 mt-1">You don't owe anyone and nobody owes you</p>
         </div>
       )}
 
       {hasOwed && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm font-semibold text-green-700 pb-2 border-b border-green-200/60 sticky top-0 bg-white/95 backdrop-blur-sm">
-            <div className="p-1 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg shadow-sm">
-              <ArrowUp className="w-3.5 h-3.5 text-white" />
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-green-700 pb-2 border-b border-green-100">
+            <ArrowUp className="w-4 h-4" />
             <span>You are owed</span>
-            <div className="ml-auto bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
+            <div className="ml-auto bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
               {youAreOwed.length}
             </div>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {youAreOwed.map((item:any)=>{
               const userColor = getUserColor(item.userId);
               return (
@@ -58,22 +54,19 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
                   key={item.userId}
                   className="block group"
                 >
-                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50/80 to-emerald-50/80 hover:from-green-100 hover:to-emerald-100 rounded-xl border border-green-200/50 hover:border-green-300/70 transition-all duration-300 hover:shadow-md group-hover:scale-[1.02]">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 hover:bg-green-50 rounded-lg border border-gray-200 hover:border-green-200 transition-colors">
                     <div className="flex items-center gap-3">
-                      <Avatar className={`h-7 w-7 ring-2 ${userColor.ring} shadow-sm`}>
+                      <Avatar className={`h-8 w-8 ${userColor.ring}`}>
                         <AvatarImage src={item.imageUrl} />
-                        <AvatarFallback className={`${userColor.bg} ${userColor.text} font-semibold text-xs`}>
+                        <AvatarFallback className={`${userColor.bg} ${userColor.text} font-medium text-sm`}>
                           {item.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-gray-800 text-sm truncate group-hover:text-green-800 transition-colors">{item.name}</span>
+                      <span className="font-medium text-gray-900 text-sm truncate">{item.name}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-green-600 group-hover:text-green-700 transition-colors">
-                        +${item.amount.toFixed(2)}
-                      </span>
-                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
+                    <span className="text-sm font-semibold text-green-600">
+                      +${item.amount.toFixed(2)}
+                    </span>
                   </div>
                 </Link>
               );
@@ -83,17 +76,15 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
       )}
 
       {hasOwing && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm font-semibold text-red-700 pb-2 border-b border-red-200/60 sticky top-0 bg-white/95 backdrop-blur-sm">
-            <div className="p-1 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg shadow-sm">
-              <ArrowDown className="w-3.5 h-3.5 text-white" />
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-red-700 pb-2 border-b border-red-100">
+            <ArrowDown className="w-4 h-4" />
             <span>You owe</span>
-            <div className="ml-auto bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">
+            <div className="ml-auto bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded-full">
               {youOwe.length}
             </div>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {youOwe.map((item:any)=>{
               const userColor = getUserColor(item.userId);
               return (
@@ -102,22 +93,19 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
                   key={item.userId}
                   className="block group"
                 >
-                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-red-50/80 to-rose-50/80 hover:from-red-100 hover:to-rose-100 rounded-xl border border-red-200/50 hover:border-red-300/70 transition-all duration-300 hover:shadow-md group-hover:scale-[1.02]">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 hover:bg-red-50 rounded-lg border border-gray-200 hover:border-red-200 transition-colors">
                     <div className="flex items-center gap-3">
-                      <Avatar className={`h-7 w-7 ring-2 ${userColor.ring} shadow-sm`}>
+                      <Avatar className={`h-8 w-8 ${userColor.ring}`}>
                         <AvatarImage src={item.imageUrl} />
-                        <AvatarFallback className={`${userColor.bg} ${userColor.text} font-semibold text-xs`}>
+                        <AvatarFallback className={`${userColor.bg} ${userColor.text} font-medium text-sm`}>
                           {item.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-gray-800 text-sm truncate group-hover:text-red-800 transition-colors">{item.name}</span>
+                      <span className="font-medium text-gray-900 text-sm truncate">{item.name}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-red-600 group-hover:text-red-700 transition-colors">
-                        -${item.amount.toFixed(2)}
-                      </span>
-                      <div className="w-1.5 h-1.5 bg-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
+                    <span className="text-sm font-semibold text-red-600">
+                      -${item.amount.toFixed(2)}
+                    </span>
                   </div>
                 </Link>
               );

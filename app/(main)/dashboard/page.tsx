@@ -5,27 +5,33 @@ import { useConvexQuery } from "@/hooks/useConvexQuery";
 import BarLoader from "react-spinners/BarLoader";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, PlusCircle, Users   } from "lucide-react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ArrowRight, PlusCircle, Users, User, Receipt, BarChart3   } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import ExpenseSummary from "./_components/expenseSummary";
 import BalanceSummary from "./_components/balanceSummary";
+import IndividualExpenses from "./_components/individualExpenses";
 import GroupList from "./_components/groupList";
+import MemberList from "./_components/memberList";
 
 const DashboardPage = () => {
   const { data: balances, loading: balancesLoading } = useConvexQuery(
     api.dashboard.getUserBalances
   );
 
+  const { data: advancedBreakdown, loading: advancedBreakdownLoading } = useConvexQuery(
+    api.dashboard.getAdvancedExpenseBreakdown
+  );
+
   const { data: groups, loading: groupsLoading } = useConvexQuery(
     api.dashboard.getUserGroups
+  );
+
+  const { data: memberBalances, loading: memberBalancesLoading } = useConvexQuery(
+    api.dashboard.getMemberBalances
+  );
+
+  const { data: individualExpenses, loading: individualExpensesLoading } = useConvexQuery(
+    api.dashboard.getIndividualExpenses
   );
 
   const { data: totalSpent, loading: totalSpentLoading } = useConvexQuery(
@@ -37,200 +43,256 @@ const DashboardPage = () => {
 
   const loading =
     balancesLoading ||
+    advancedBreakdownLoading ||
     groupsLoading ||
+    memberBalancesLoading ||
+    individualExpensesLoading ||
     totalSpentLoading ||
     monthlySpendingLoading;
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[200px]">
-          <BarLoader color="#3b82f6" width={200} />
-        </div>
-      ) : (
-        <>
-          {/* Header Section */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <Button
-              variant="outline"
-              asChild
-              className="flex items-center gap-2"
-            >
-              <Link href="/expenses/new">
-                <PlusCircle className="h-4 w-4" />
-                Add Expense
-              </Link>
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="container mx-auto px-4 py-8 max-w-7xl space-y-8">
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <p className="text-gray-600 font-medium">Loading your dashboard...</p>
+            </div>
           </div>
-
-          {/* Cards Grid */}
-          {/* Combined Balance Card */}
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-white via-slate-50 to-gray-100 overflow-hidden">
-            <CardContent className="p-5">
-              {/* Upper Section - Total Balance */}
-              <div className="text-center mb-5 pb-4 border-b border-gray-200">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-3 shadow-md">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">Total Balance</h3>
-                <div className="text-3xl font-bold mb-2">
-                  {balances?.totalBalance > 0 ? (
-                    <span className="text-green-600">
-                      +${balances.totalBalance.toFixed(2)}
-                    </span>
-                  ) : balances?.totalBalance < 0 ? (
-                    <span className="text-red-600">
-                      -${Math.abs(balances.totalBalance).toFixed(2)}
-                    </span>
-                  ) : (
-                    <span className="text-gray-600">$0.00</span>
-                  )}
-                </div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  balances?.totalBalance > 0 
-                    ? "bg-green-100 text-green-700 border border-green-200" 
-                    : balances?.totalBalance < 0 
-                      ? "bg-red-100 text-red-700 border border-red-200"
-                      : "bg-gray-100 text-gray-700 border border-gray-200"
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                    balances?.totalBalance > 0 
-                      ? "bg-green-500" 
-                      : balances?.totalBalance < 0 
-                        ? "bg-red-500"
-                        : "bg-gray-500"
-                  }`}></div>
-                  {balances?.totalBalance > 0
-                    ? "You are owed money"
-                    : balances?.totalBalance < 0
-                      ? "You owe money"
-                      : "All settled up"}
-                </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-600">Track your expenses and balances</p>
               </div>
-
-              {/* Lower Section - You Are Owed (Left) and You Owe (Right) */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Left - You Are Owed */}
-                <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-xl p-4 border border-green-200/50 shadow-sm hover:shadow-md transition-all duration-300 group">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h4 className="text-sm font-bold text-green-800 mb-2 text-center">You Are Owed</h4>
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-green-700 mb-1">
-                      ${balances?.youAreOwed?.toFixed(2) || "0.00"}
-                    </div>
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-200/70 text-green-800 text-xs font-medium">
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      From {balances?.oweDetails?.youAreOwed?.length || 0}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right - You Owe */}
-                <div className="bg-gradient-to-br from-red-50 via-rose-50 to-red-100 rounded-xl p-4 border border-red-200/50 shadow-sm hover:shadow-md transition-all duration-300 group">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h4 className="text-sm font-bold text-red-800 mb-2 text-center">You Owe</h4>
-                  <div className="text-center">
-                    {balances?.oweDetails?.youOwe?.length > 0 ? (
-                      <>
-                        <div className="text-xl font-bold text-red-700 mb-1">
-                          ${balances?.youOwe?.toFixed(2) || "0.00"}
-                        </div>
-                        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-200/70 text-red-800 text-xs font-medium">
-                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          To {balances?.oweDetails.youOwe.length || 0}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-xl font-bold text-gray-600 mb-1">
-                          $0.00
-                        </div>
-                        <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-200/70 text-gray-700 text-xs font-medium">
-                          <svg className="w-3 h-3 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          No debts
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Main Content Grid - Equal Heights */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Left Side - Expense Summary */}
-            <div className="lg:col-span-2">
-              <ExpenseSummary
-                monthlySpending={monthlySpending}
-                totalSpent={totalSpent}
-              />
+              <Button
+                asChild
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg"
+              >
+                <Link href="/expenses/new">
+                  <PlusCircle className="h-5 w-5" />
+                  Add Expense
+                </Link>
+              </Button>
             </div>
 
-            {/* Right Side - Balance Summary and Group List */}
-            <div className="flex flex-col space-y-5 lg:h-[510px]">
-              <div className="h-[280px] flex flex-col bg-white rounded-lg border shadow-sm">
-                <div className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 flex-shrink-0">
-                  <h3 className="text-lg font-semibold">Balance Details</h3>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/contacts" className="flex items-center gap-2">
-                    View All
-                    <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
+            {/* Total Balance Section - Full Width */}
+            <div>
+              <div className="bg-gradient-to-br from-white to-slate-50/40 rounded-lg shadow-lg border-0 overflow-hidden">
+                {/* Header with Icon */}
+                <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/20 rounded-lg">
+                      <Receipt className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Advanced Financial Overview</h2>
+                      <p className="text-sm text-white/80 mt-1">Individual & Group Expenses</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-4">
-                  <BalanceSummary balances={balances} />
-                </div>
-              </div>
+                
+                {/* Main Content */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Total Balance - Center */}
+                    <div className="lg:col-span-1">
+                      <div className="text-center h-full flex flex-col justify-center">
+                        <h3 className="text-sm font-medium text-gray-500 mb-2">Total Balance</h3>
+                        <div className="text-5xl font-bold mb-3">
+                          {advancedBreakdown?.totalBalance > 0 ? (
+                            <span className="text-green-600">
+                              +${advancedBreakdown.totalBalance.toFixed(2)}
+                            </span>
+                          ) : advancedBreakdown?.totalBalance < 0 ? (
+                            <span className="text-red-600">
+                              -${Math.abs(advancedBreakdown.totalBalance).toFixed(2)}
+                            </span>
+                          ) : (
+                            <span className="text-gray-900">$0.00</span>
+                          )}
+                        </div>
+                        <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
+                          advancedBreakdown?.totalBalance > 0 
+                            ? "bg-green-100 text-green-800 border border-green-200" 
+                            : advancedBreakdown?.totalBalance < 0 
+                              ? "bg-red-100 text-red-800 border border-red-200"
+                              : "bg-gray-100 text-gray-800 border border-gray-200"
+                        }`}>
+                          {advancedBreakdown?.totalBalance > 0
+                            ? "💰 You are owed money"
+                            : advancedBreakdown?.totalBalance < 0
+                              ? "💸 You owe money"
+                              : "✅ All settled up"}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* You Are Owed - Right */}
+                    <div className="lg:col-span-1">
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200/50 h-full flex flex-col">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 bg-green-100 rounded-lg">
+                            <span className="text-green-600 text-lg">💰</span>
+                          </div>
+                          <h4 className="text-lg font-semibold text-gray-900">You Are Owed</h4>
+                        </div>
+                        <div className="text-3xl font-bold text-green-600 mb-2">
+                          ${advancedBreakdown?.grossYouAreOwed?.toFixed(2) || "0.00"}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          From {advancedBreakdown?.oweDetails?.youAreOwed?.length || 0} people
+                        </div>
+                        <div className="mt-auto">
+                          {advancedBreakdown?.oweDetails?.youAreOwed?.length > 0 && (
+                            <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
+                              Pending settlements
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-              <div className="h-[295px] flex flex-col bg-white rounded-lg border shadow-sm">
-                <div className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 flex-shrink-0">
-                  <h3 className="text-lg font-semibold">Your Groups</h3>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/contacts" className="flex items-center gap-2">
-                    View All 
-                    <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                </div>
-                <div className="flex-1 overflow-y-auto min-h-0 px-4">
-                  <GroupList groups={groups} />
-                </div>
-                <div className="flex-shrink-0 flex justify-center p-4 pt-3">
-                  <Button asChild>
-                    <Link href="/contacts?createGroup=true">
-                    <Users/>  
-                    Create New Group
-                    </Link>
-                  </Button>
+                    {/* You Owe - Right */}
+                    <div className="lg:col-span-1">
+                      <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-lg p-4 border border-red-200/50 h-full flex flex-col">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 bg-red-100 rounded-lg">
+                            <span className="text-red-600 text-lg">💸</span>
+                          </div>
+                          <h4 className="text-lg font-semibold text-gray-900">You Owe</h4>
+                        </div>
+                        <div className="text-3xl font-bold text-red-600 mb-2">
+                          ${advancedBreakdown?.grossYouOwe?.toFixed(2) || "0.00"}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          To {advancedBreakdown?.oweDetails?.youOwe?.length || 0} people
+                        </div>
+                        <div className="mt-auto">
+                          {advancedBreakdown?.oweDetails?.youOwe?.length > 0 && (
+                            <div className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded">
+                              Outstanding payments
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+
+            {/* Main Grid Layout */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              
+              {/* Left Column - Main Content */}
+              <div className="xl:col-span-3 space-y-6">
+
+                {/* Advanced Expense Breakdown - Above Graph */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-lg border-0 h-80 flex flex-col">
+                  <div className="px-6 py-4 border-b border-green-200/50 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <BarChart3 className="w-5 h-5 text-green-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Detailed Balance Breakdown</h3>
+                      </div>
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href="/contacts">
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-6">
+                      <BalanceSummary balances={advancedBreakdown} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expense Summary - Full Width */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg border-0 h-80">
+                  <ExpenseSummary
+                    monthlySpending={monthlySpending}
+                    totalSpent={totalSpent}
+                  />
+                </div>
+              </div>
+
+              {/* Right Column - Sidebar */}
+              <div className="xl:col-span-1 flex flex-col space-y-6">
+                
+                {/* Individual Expenses */}
+                <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg shadow-lg border-0 h-80 flex flex-col">
+                  <div className="px-6 py-4 border-b border-purple-200/50 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                          <User className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Individual Expenses</h3>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-6">
+                      <BalanceSummary balances={balances} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Group Expenses */}
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg shadow-lg border-0 h-[33.625rem] flex flex-col">
+                  <div className="px-6 py-4 border-b border-orange-200/50 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <Users className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Group Expenses</h3>
+                      </div>
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href="/contacts">
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-6 space-y-6">
+                      {/* Groups Section */}
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Your Groups</h4>
+                      <div className="max-h-48 overflow-y-auto">
+                        <GroupList groups={groups} />
+                      </div>
+                      
+                      {/* Group Members Section */}
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Group Members</h4>
+                      <div className="max-h-48 overflow-y-auto">
+                        <MemberList members={memberBalances} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-6 py-3 border-t border-orange-200/50 flex-shrink-0">
+                    <Button asChild className="w-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg text-sm py-2">
+                      <Link href="/contacts?createGroup=true">
+                        <Users className="w-4 h-4 mr-2" />
+                        Create New Group
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
