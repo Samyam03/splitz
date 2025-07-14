@@ -1,11 +1,9 @@
 import { internal } from "./_generated/api";
 import { query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { v } from "convex/values";
 
-interface UserBalance {
-    owed: number;
-    owedTo: number;
-}
+
 
 interface BalanceDetails {
     userId: string;
@@ -449,6 +447,8 @@ export const getAdvancedExpenseBreakdown = query({
 
         // Calculate individual balances with each user
         const balanceByUser: Record<string, number> = {};
+        // Track all users involved in transactions
+        const allUsersInvolved = new Set<string>();
         // For gross calculation
         let grossYouOwe = 0;
         let grossYouAreOwed = 0;
@@ -460,10 +460,12 @@ export const getAdvancedExpenseBreakdown = query({
             // Find all other users involved in this expense
             if (expense.paidByUserId !== user._id) {
                 otherUserIds.add(expense.paidByUserId)
+                allUsersInvolved.add(expense.paidByUserId)
             }
             expense.splits.forEach(split => {
                 if (split.userId !== user._id) {
                     otherUserIds.add(split.userId)
+                    allUsersInvolved.add(split.userId)
                 }
             })
 
@@ -496,11 +498,13 @@ export const getAdvancedExpenseBreakdown = query({
                 balanceByUser[settlement.receivedByUserId] ??= 0
                 balanceByUser[settlement.receivedByUserId] += settlement.amount
                 grossYouAreOwed += settlement.amount // Add to gross
+                allUsersInvolved.add(settlement.receivedByUserId)
             } else {
                 // They paid me
                 balanceByUser[settlement.paidByUserId] ??= 0
                 balanceByUser[settlement.paidByUserId] -= settlement.amount
                 grossYouOwe += settlement.amount // Add to gross
+                allUsersInvolved.add(settlement.paidByUserId)
             }
         }
 
@@ -540,6 +544,144 @@ export const getAdvancedExpenseBreakdown = query({
             oweDetails: { youOwe: youOweList, youAreOwed: youAreOwedList },
             grossYouOwe,
             grossYouAreOwed,
+            totalUsersInvolved: allUsersInvolved.size,
         }
     }
 })
+
+export const getMemberDetails = query({
+    args: { memberId: v.id("users") },
+    handler: async (ctx, { memberId }) => {
+        const currentUser = await ctx.runQuery(internal.users.getCurrentUser)
+
+        if (!currentUser) {
+            throw new Error("User not found or not authenticated");
+        }
+
+        // Get the member user details
+        const memberUser = await ctx.db.get(memberId);
+        if (!memberUser) {
+            throw new Error("Member not found");
+        }
+
+        // Get all groups where both current user and member are present
+        const allGroups = await ctx.db.query("groups").collect();
+        const sharedGroups = allGroups.filter((group) => 
+            group.members.some((member) => member.userId === currentUser._id) &&
+            group.members.some((member) => member.userId === memberId)
+        );
+
+        const groupBreakdowns: Array<{
+            groupId: Id<"groups">;
+            groupName: string;
+            groupDescription?: string;
+            balance: number;
+            expenses: Array<{
+                _id: Id<"expenses">;
+                description: string;
+                amount: number;
+                category?: string;
+                date: number;
+                paidByUserId: Id<"users">;
+                splitType: string;
+                splits: Array<{
+                    userId: Id<"users">;
+                    amount: number;
+                    paid: boolean;
+                }>;
+                groupId?: Id<"groups">;
+                createdBy: Id<"users">;
+            }>;
+            settlements: Array<{
+                _id: Id<"settlements">;
+                amount: number;
+                note?: string;
+                date: number;
+                paidByUserId: Id<"users">;
+                receivedByUserId: Id<"users">;
+                groupId?: Id<"groups">;
+                relatedExpenseIds?: Id<"expenses">[];
+                createdBy: Id<"users">;
+            }>;
+        }> = [];
+
+        let totalBalance = 0;
+
+        for (const group of sharedGroups) {
+            const expenses = await ctx.db
+                .query("expenses")
+                .withIndex("by_group", (q) => q.eq("groupId", group._id))
+                .collect();
+
+            const settlements = await ctx.db
+                .query("settlements")
+                .withIndex("by_group", (q) => q.eq("groupId", group._id))
+                .collect();
+
+            let balance = 0;
+
+            // Calculate balance for this group
+            expenses.forEach((expense) => {
+                if (expense.paidByUserId === currentUser._id) {
+                    // I paid, they owe me
+                    const split = expense.splits.find((split) => 
+                        split.userId === memberId && !split.paid
+                    );
+                    if (split) {
+                        balance += split.amount;
+                    }
+                } else if (expense.paidByUserId === memberId) {
+                    // They paid, I owe them
+                    const userSplit = expense.splits.find((split) => 
+                        split.userId === currentUser._id && !split.paid
+                    );
+                    if (userSplit) {
+                        balance -= userSplit.amount;
+                    }
+                }
+            });
+
+            // Process settlements for this group
+            settlements.forEach((settlement) => {
+                if (settlement.paidByUserId === currentUser._id && settlement.receivedByUserId === memberId) {
+                    balance += settlement.amount;
+                } else if (settlement.paidByUserId === memberId && settlement.receivedByUserId === currentUser._id) {
+                    balance -= settlement.amount;
+                }
+            });
+
+            totalBalance += balance;
+
+            groupBreakdowns.push({
+                groupId: group._id,
+                groupName: group.name,
+                groupDescription: group.description,
+                balance,
+                expenses: expenses.filter(expense => 
+                    expense.paidByUserId === currentUser._id || 
+                    expense.paidByUserId === memberId ||
+                    expense.splits.some(split => split.userId === currentUser._id) ||
+                    expense.splits.some(split => split.userId === memberId)
+                ),
+                settlements: settlements.filter(settlement =>
+                    (settlement.paidByUserId === currentUser._id && settlement.receivedByUserId === memberId) ||
+                    (settlement.paidByUserId === memberId && settlement.receivedByUserId === currentUser._id)
+                )
+            });
+        }
+
+        // Sort groups by absolute balance (highest first)
+        groupBreakdowns.sort((a, b) => Math.abs(b.balance) - Math.abs(a.balance));
+
+        return {
+            member: {
+                id: memberUser._id,
+                name: memberUser.name || "Unknown User",
+                email: memberUser.email,
+                imageUrl: memberUser.imageUrl,
+            },
+            totalBalance,
+            groupBreakdowns,
+        };
+    }
+});

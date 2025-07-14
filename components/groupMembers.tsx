@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { getUserColor } from '@/lib/userColors';
 import { Crown, User } from 'lucide-react';
+import Link from 'next/link';
 
 const GroupMembers = ({members}: {members: any}) => {
 
@@ -32,10 +33,10 @@ const GroupMembers = ({members}: {members: any}) => {
             const userColor = getUserColor(member.id);
 
             return(
-                <div 
-                    key={member.id}
-                    className="group hover:shadow-md transition-all duration-300 bg-gradient-to-r from-white to-slate-50/60 hover:from-slate-50 hover:to-gray-50 rounded-xl border border-slate-200/50 hover:border-slate-300/70 p-4 hover:scale-[1.02]"
-                >
+                <Link key={member.id} href={`/member/${member.id}`} className="block">
+                    <div 
+                        className="group hover:shadow-md transition-all duration-300 bg-gradient-to-r from-white to-slate-50/60 hover:from-slate-50 hover:to-gray-50 rounded-xl border border-slate-200/50 hover:border-slate-300/70 p-4 hover:scale-[1.02] cursor-pointer"
+                    >
                     <div className="flex items-center gap-4">
                         <Avatar className={`h-10 w-10 ring-2 ${userColor.ring} shadow-sm group-hover:shadow-md transition-shadow`}>
                             <AvatarImage src={member.imageUrl} alt={member.name} />
@@ -70,6 +71,7 @@ const GroupMembers = ({members}: {members: any}) => {
                         </div>
                     </div>
                 </div>
+                </Link>
             )
       })}
     </div>

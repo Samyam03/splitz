@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from './_generated/dataModel';
 
 export const getGroupExpenses = query({
   args: {
@@ -10,7 +10,7 @@ export const getGroupExpenses = query({
   handler: async (ctx, { groupId }) => {
     const currentUser = await ctx.runQuery(internal.users.getCurrentUser);
 
-    const group = await ctx.db.get(groupId);
+    const group: Doc<"groups"> | null = await ctx.db.get(groupId);
 
     if (!group) {
       throw new Error("Group not found");
@@ -152,17 +152,36 @@ export const getGroupOrMembers = query({
   args: {
     groupId: v.optional(v.id("groups")),
   },
-  handler: async (ctx, args) => {
-    const currentUser = await ctx.runQuery(internal.users.getCurrentUser);
+  handler: async (ctx, args): Promise<{
+    selectedGroup: {
+      id: Id<"groups">;
+      name: string | undefined;
+      description: string | undefined;
+      createdBy: Id<"users">;
+      members: {
+        id: Id<"users">;
+        name: string | undefined;
+        imageUrl: string | undefined;
+        role: string;
+      }[];
+    } | null;
+    groups: {
+      id: Id<"groups">;
+      name: string | undefined;
+      description: string | undefined;
+      memberCount: number;
+    }[];
+  }> => {
+    const currentUser: Doc<'users'> | null = await ctx.runQuery(internal.users.getCurrentUser);
 
-    const allGroups = await ctx.db.query("groups").collect();
-    const userGroups = allGroups.filter((group: any) => 
-      group.members.some((member: any) => member.userId === currentUser?._id)
+    const allGroups: Doc<'groups'>[] = await ctx.db.query("groups").collect();
+    const userGroups: Doc<'groups'>[] = allGroups.filter((group: Doc<'groups'>) => 
+      group.members.some((member) => member.userId === currentUser?._id)
     );
   
     if (args.groupId) {
-      const selectedGroup = userGroups.find(
-        (group: any) => group._id === args.groupId
+      const selectedGroup: Doc<'groups'> | undefined = userGroups.find(
+        (group: Doc<'groups'>) => group._id === args.groupId
       );
       
       if (!selectedGroup) {
@@ -170,7 +189,7 @@ export const getGroupOrMembers = query({
       }
     
       const memberDetails = await Promise.all(
-        selectedGroup.members.map(async (member: { userId: Id<"users">; role: string; joinedAt: number }) => {
+        selectedGroup.members.map(async (member: { userId: Id<'users'>; role: string; joinedAt: number }) => {
           const user = await ctx.db
             .query("users")
             .filter((q) => q.eq(q.field("_id"), member.userId))
@@ -182,7 +201,7 @@ export const getGroupOrMembers = query({
 
           return {
             id: member.userId,
-            name: user.name,
+            name: user.name || undefined,
             imageUrl: user.imageUrl,
             role: member.role,
           };
@@ -191,8 +210,8 @@ export const getGroupOrMembers = query({
 
       const validMembers = memberDetails.filter(
         (member): member is {
-          id: Id<"users">;
-          name: string;
+          id: Id<'users'>;
+          name: string | undefined;
           imageUrl: string | undefined;
           role: string;
         } => member !== null
@@ -206,7 +225,7 @@ export const getGroupOrMembers = query({
           createdBy: selectedGroup.createdBy,
           members: validMembers,
         },
-        groups: userGroups.map((group: any) => ({
+        groups: userGroups.map((group: Doc<'groups'>) => ({
           id: group._id,
           name: group.name,
           description: group.description,
@@ -216,7 +235,7 @@ export const getGroupOrMembers = query({
     } else {
       return {
         selectedGroup: null,
-        groups: userGroups.map((group: any) => ({
+        groups: userGroups.map((group: Doc<'groups'>) => ({
           id: group._id,
           name: group.name,
           description: group.description,

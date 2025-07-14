@@ -42,7 +42,7 @@ const MemberList = ({ members }: MemberListProps) => {
                 const isPositive = balance > 0;
                 
                 return (
-                    <Link key={`${member.userId}-${index}`} href={`/user/${member.userId}`} className="block group">
+                    <Link key={`${member.userId}-${index}`} href={`/member/${member.userId}`} className="block group">
                         <div className="flex items-center justify-between p-3 bg-gray-50 hover:bg-green-50 rounded-lg border border-gray-200 hover:border-green-200 transition-colors">
                             <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <div className="flex items-center justify-center bg-green-100 rounded-lg w-8 h-8 flex-shrink-0">

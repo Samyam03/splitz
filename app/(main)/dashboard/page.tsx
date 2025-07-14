@@ -9,6 +9,7 @@ import { ArrowRight, PlusCircle, Users, User, Receipt, BarChart3   } from "lucid
 import { Card, CardContent } from "@/components/ui/card";
 import ExpenseSummary from "./_components/expenseSummary";
 import BalanceSummary from "./_components/balanceSummary";
+import DetailedBalanceSummary from "./_components/detailedBalanceSummary";
 import IndividualExpenses from "./_components/individualExpenses";
 import GroupList from "./_components/groupList";
 import MemberList from "./_components/memberList";
@@ -134,19 +135,35 @@ const DashboardPage = () => {
                     {/* You Are Owed - Right */}
                     <div className="lg:col-span-1">
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200/50 h-full flex flex-col">
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-3 mb-3 flex-shrink-0">
                           <div className="p-2 bg-green-100 rounded-lg">
                             <span className="text-green-600 text-lg">💰</span>
                           </div>
                           <h4 className="text-lg font-semibold text-gray-900">You Are Owed</h4>
                         </div>
-                        <div className="text-3xl font-bold text-green-600 mb-2">
+                        <div className="text-3xl font-bold text-green-600 mb-2 flex-shrink-0">
                           ${advancedBreakdown?.grossYouAreOwed?.toFixed(2) || "0.00"}
                         </div>
-                        <div className="text-sm text-gray-600 mb-2">
-                          From {advancedBreakdown?.oweDetails?.youAreOwed?.length || 0} people
+                        <div className="text-sm text-gray-600 mb-2 flex-shrink-0">
+                          From {advancedBreakdown?.totalUsersInvolved || 0} people
                         </div>
-                        <div className="mt-auto">
+                        <div className="flex-1 overflow-y-auto min-h-0">
+                          {advancedBreakdown?.oweDetails?.youAreOwed?.length > 0 && (
+                            <div className="space-y-1">
+                              {advancedBreakdown.oweDetails.youAreOwed.slice(0, 3).map((item: any) => (
+                                <div key={item.userId} className="flex items-center justify-between p-2 bg-white/60 rounded-lg border border-green-200/30">
+                                  <span className="text-xs font-bold text-green-600">+${item.amount.toFixed(2)}</span>
+                                </div>
+                              ))}
+                              {advancedBreakdown.oweDetails.youAreOwed.length > 3 && (
+                                <div className="text-xs text-green-600 text-center py-1">
+                                  +{advancedBreakdown.oweDetails.youAreOwed.length - 3} more
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2 flex-shrink-0">
                           {advancedBreakdown?.oweDetails?.youAreOwed?.length > 0 && (
                             <div className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
                               Pending settlements
@@ -159,19 +176,35 @@ const DashboardPage = () => {
                     {/* You Owe - Right */}
                     <div className="lg:col-span-1">
                       <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-lg p-4 border border-red-200/50 h-full flex flex-col">
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-3 mb-3 flex-shrink-0">
                           <div className="p-2 bg-red-100 rounded-lg">
                             <span className="text-red-600 text-lg">💸</span>
                           </div>
                           <h4 className="text-lg font-semibold text-gray-900">You Owe</h4>
                         </div>
-                        <div className="text-3xl font-bold text-red-600 mb-2">
+                        <div className="text-3xl font-bold text-red-600 mb-2 flex-shrink-0">
                           ${advancedBreakdown?.grossYouOwe?.toFixed(2) || "0.00"}
                         </div>
-                        <div className="text-sm text-gray-600 mb-2">
-                          To {advancedBreakdown?.oweDetails?.youOwe?.length || 0} people
+                        <div className="text-sm text-gray-600 mb-2 flex-shrink-0">
+                          To {advancedBreakdown?.totalUsersInvolved || 0} people
                         </div>
-                        <div className="mt-auto">
+                        <div className="flex-1 overflow-y-auto min-h-0">
+                          {advancedBreakdown?.oweDetails?.youOwe?.length > 0 && (
+                            <div className="space-y-1">
+                              {advancedBreakdown.oweDetails.youOwe.slice(0, 3).map((item: any) => (
+                                <div key={item.userId} className="flex items-center justify-between p-2 bg-white/60 rounded-lg border border-red-200/30">
+                                  <span className="text-xs font-bold text-red-600">-${item.amount.toFixed(2)}</span>
+                                </div>
+                              ))}
+                              {advancedBreakdown.oweDetails.youOwe.length > 3 && (
+                                <div className="text-xs text-red-600 text-center py-1">
+                                  +{advancedBreakdown.oweDetails.youOwe.length - 3} more
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2 flex-shrink-0">
                           {advancedBreakdown?.oweDetails?.youOwe?.length > 0 && (
                             <div className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded">
                               Outstanding payments
@@ -192,25 +225,18 @@ const DashboardPage = () => {
               <div className="xl:col-span-3 space-y-6">
 
                 {/* Advanced Expense Breakdown - Above Graph */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-lg border-0 h-80 flex flex-col">
-                  <div className="px-6 py-4 border-b border-green-200/50 flex-shrink-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                          <BarChart3 className="w-5 h-5 text-green-600" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">Detailed Balance Breakdown</h3>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg border-0 h-80 flex flex-col">
+                  <div className="px-6 py-4 border-b border-blue-200/50 flex-shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <BarChart3 className="w-5 h-5 text-blue-600" />
                       </div>
-                      <Button asChild variant="ghost" size="sm">
-                        <Link href="/contacts">
-                          <ArrowRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
+                      <h3 className="text-lg font-semibold text-gray-900">Balance Breakdown</h3>
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto">
                     <div className="p-6">
-                      <BalanceSummary balances={advancedBreakdown} />
+                      <DetailedBalanceSummary balances={advancedBreakdown} />
                     </div>
                   </div>
                 </div>
@@ -265,17 +291,21 @@ const DashboardPage = () => {
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto">
-                    <div className="p-6 space-y-6">
+                    <div className="p-6 space-y-6 h-full flex flex-col">
                       {/* Groups Section */}
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Your Groups</h4>
-                      <div className="max-h-48 overflow-y-auto">
-                        <GroupList groups={groups} />
+                      <div className="flex-1 min-h-0 flex flex-col">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3 flex-shrink-0">Your Groups</h4>
+                        <div className="flex-1 overflow-y-auto min-h-0">
+                          <GroupList groups={groups} />
+                        </div>
                       </div>
                       
                       {/* Group Members Section */}
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Group Members</h4>
-                      <div className="max-h-48 overflow-y-auto">
-                        <MemberList members={memberBalances} />
+                      <div className="flex-1 min-h-0 flex flex-col">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3 flex-shrink-0">Group Members</h4>
+                        <div className="flex-1 overflow-y-auto min-h-0">
+                          <MemberList members={memberBalances} />
+                        </div>
                       </div>
                     </div>
                   </div>

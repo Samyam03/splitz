@@ -138,7 +138,7 @@ const GroupBalances = ({balances}: {balances: any}) => {
                     const userColor = getUserColor(item.id);
                     return (
                       <Link 
-                        href={`/user/${item.id}`} 
+                        href={`/member/${item.id}`} 
                         key={`owed-by-${item.id}`}
                         className="block group"
                       >
@@ -181,7 +181,7 @@ const GroupBalances = ({balances}: {balances: any}) => {
                    const userColor = getUserColor(item.id);
                    return (
                      <Link 
-                       href={`/user/${item.id}`} 
+                       href={`/member/${item.id}`} 
                        key={`owes-to-${item.id}`}
                        className="block group"
                      >
