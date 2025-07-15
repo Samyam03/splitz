@@ -57,7 +57,7 @@ export const createSettlement = mutation({
         }
     }
 
-    return await ctx.db.insert("settlements", {
+    const settlementId = await ctx.db.insert("settlements", {
         amount: args.amount,
         note: args.note,
         date: Date.now(),
@@ -66,7 +66,14 @@ export const createSettlement = mutation({
         groupId: args.groupId,
         relatedExpenseIds: args.relatedExpenseIds,
         createdBy: caller._id,
-    })
+    });
+
+    // Send email notification about the new settlement
+    await ctx.runMutation(internal.emails.sendSettlementAddedNotification, {
+        settlementId,
+    });
+
+    return settlementId;
 
     
   },
@@ -94,7 +101,24 @@ export const deleteSettlement = mutation({
             throw new Error("You are not authorized to delete this settlement");
         }
 
+        // Get settlement details before deleting
+        const settlementDetails = {
+            amount: settlement.amount,
+            note: settlement.note,
+            date: settlement.date,
+            paidByUserId: settlement.paidByUserId,
+            receivedByUserId: settlement.receivedByUserId,
+            groupId: settlement.groupId,
+        };
+
         await ctx.db.delete(settlementId);
+
+        // Send email notification about the deleted settlement
+        await ctx.runMutation(internal.emails.sendSettlementDeletedNotification, {
+            settlement: settlementDetails,
+            deletedByUserId: user._id,
+        });
+
         return { success: true }
     }
 });

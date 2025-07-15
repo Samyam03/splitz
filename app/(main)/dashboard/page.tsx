@@ -14,6 +14,7 @@ import IndividualExpenses from "./_components/individualExpenses";
 import GroupList from "./_components/groupList";
 import MemberList from "./_components/memberList";
 
+
 const DashboardPage = () => {
   const { data: balances, loading: balancesLoading } = useConvexQuery(
     api.dashboard.getUserBalances
@@ -318,6 +319,8 @@ const DashboardPage = () => {
                     </Button>
                   </div>
                 </div>
+                
+
               </div>
             </div>
           </>

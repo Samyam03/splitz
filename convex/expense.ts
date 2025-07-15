@@ -137,7 +137,28 @@ export const deleteExpense = mutation({
             throw new Error("You are not the payer of this expense so you cannot delete it");
         }
 
+        // Get participant IDs before deleting the expense
+        const participantIds = expense.splits.map(split => split.userId);
+
         await ctx.db.delete(expenseId);
+
+        // Send email notifications about the deleted expense
+        if (participantIds.length > 0) {
+            await ctx.runMutation(internal.emails.sendExpenseDeletedNotification, {
+                expense: {
+                    description: expense.description,
+                    amount: expense.amount,
+                    date: expense.date,
+                    category: expense.category,
+                    splitType: expense.splitType,
+                    paidByUserId: expense.paidByUserId,
+                    groupId: expense.groupId,
+                },
+                deletedByUserId: user._id,
+                participantIds,
+            });
+        }
+
         return {success:true}
     }
 })
@@ -200,6 +221,15 @@ export const createExpense = mutation({
         groupId: args.groupId,
         createdBy: user._id,
       })
+
+      // Send email notifications to all participants
+      const participantIds = args.splits.map(split => split.userId);
+      if (participantIds.length > 0) {
+        await ctx.runMutation(internal.emails.sendExpenseAddedNotification, {
+          expenseId,
+          participantIds,
+        });
+      }
 
       return {success: true, expenseId}
       }
