@@ -51,7 +51,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
   
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
         {/* Selected Participants */}
         {participants.map((participant: any, index: number) => {
           const userColor = getUserColor(participant.id);
@@ -59,19 +59,19 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
           return (
             <Badge
               key={participant.id || `participant-${index}`}
-              className={`flex items-center gap-2 px-2 py-1 text-xs transition-all duration-200 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 text-xs transition-all duration-200 ${
                 isCurrentUser 
                   ? "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200" 
                   : "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200"
               }`}
             >
-              <Avatar className={`h-5 w-5 ring-1 ${userColor.ring}`}>
+              <Avatar className={`h-4 w-4 sm:h-5 sm:w-5 ring-1 ${userColor.ring}`}>
                 <AvatarImage src={participant.imageUrl} alt={participant.name} />
                 <AvatarFallback className={`text-xs font-medium ${userColor.bg} ${userColor.text}`}>
                   {participant.name?.charAt(0).toUpperCase() || "?"}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-medium max-w-[80px] truncate">
+              <span className="font-medium max-w-[60px] sm:max-w-[80px] truncate">
                 {isCurrentUser ? "You" : participant.name}
               </span>
               {!isCurrentUser && (
@@ -80,9 +80,9 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
                   variant="ghost"
                   size="sm"
                   type="button"
-                  className="h-4 w-4 p-0 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
+                  className="h-3 w-3 sm:h-4 sm:w-4 p-0 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </Button>
               )}
             </Badge>
@@ -95,15 +95,15 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
             <Button 
               type="button"
               size="sm"
-              className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-medium px-2 py-1 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-xs"
+              className="flex items-center gap-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-medium px-1.5 sm:px-2 py-1 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-xs"
             >
-              <UserPlus className="h-3 w-3" />
+              <UserPlus className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               Add
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-0 shadow-xl border-0 rounded-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 border-b">
-              <h4 className="font-semibold text-gray-800">Add Participants</h4>
+          <PopoverContent className="w-72 sm:w-80 p-0 shadow-xl border-0 rounded-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-2 sm:p-3 border-b">
+              <h4 className="font-semibold text-gray-800 text-sm sm:text-base">Add Participants</h4>
             </div>
             <Command className="border-0">
               <CommandInput
@@ -112,24 +112,24 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
                 onValueChange={setSearchQuery}
                 className="border-0 focus:ring-0"
               />
-              <CommandList className="max-h-64">
-                <CommandEmpty className="py-6 text-center">
+              <CommandList className="max-h-48 sm:max-h-64">
+                <CommandEmpty className="py-4 sm:py-6 text-center">
                   {searchQuery.length < 2 ? (
                     <div className="space-y-2">
-                      <UserPlus className="h-8 w-8 text-gray-400 mx-auto" />
-                      <p className="text-gray-500">Type at least 2 characters to search</p>
+                      <UserPlus className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto" />
+                      <p className="text-gray-500 text-xs sm:text-sm">Type at least 2 characters to search</p>
                     </div>
                   ) : isSearching ? (
                     <div className="space-y-2">
-                      <Loader2 className="h-8 w-8 text-blue-500 mx-auto animate-spin" />
-                      <p className="text-blue-600">Searching...</p>
+                      <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mx-auto animate-spin" />
+                      <p className="text-blue-600 text-xs sm:text-sm">Searching...</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="h-8 w-8 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
-                        <X className="h-4 w-4 text-gray-400" />
+                      <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
+                        <X className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                       </div>
-                      <p className="text-gray-500">No participants found</p>
+                      <p className="text-gray-500 text-xs sm:text-sm">No participants found</p>
                     </div>
                   )}
                 </CommandEmpty>
@@ -141,20 +141,20 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
                         key={user.id}
                         value={`${user.name} ${user.email || ""}`}
                         onSelect={() => addParticipant(user)}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200"
+                        className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200"
                       >
-                        <Avatar className={`h-8 w-8 ring-2 ${userColor.ring}`}>
+                        <Avatar className={`h-6 w-6 sm:h-8 sm:w-8 ring-2 ${userColor.ring}`}>
                           <AvatarImage
                             src={user.imageUrl}
                             alt={user.name}
                           />
-                          <AvatarFallback className={`text-sm font-semibold ${userColor.bg} ${userColor.text}`}>
+                          <AvatarFallback className={`text-xs sm:text-sm font-semibold ${userColor.bg} ${userColor.text}`}>
                             {user.name?.charAt(0).toUpperCase() || "?"}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-800">{user.name}</p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-800 text-xs sm:text-sm truncate">{user.name}</p>
+                          <p className="text-gray-500 text-xs truncate">{user.email}</p>
                         </div>
                       </CommandItem>
                     );

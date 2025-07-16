@@ -163,7 +163,7 @@ export const getSettlementData = query({
         }
 
         if(args.entityType === "user"){
-            if (typeof args.entityid === 'string' && args.entityid.startsWith('users|')) {
+            if (typeof args.entityid === 'string') {
                 const otherUserId = args.entityid as Id<'users'>;
                 const other: Doc<'users'> | null = await ctx.db.get(otherUserId);
                 if(!other){

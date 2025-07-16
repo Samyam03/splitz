@@ -15,9 +15,9 @@ import Image from 'next/image'
 
 const Header = () => {
   return (
-    <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm px-6 sm:px-8 flex items-center z-50">
+    <nav className="fixed top-0 left-0 w-full h-14 sm:h-16 bg-white shadow-sm px-4 sm:px-6 lg:px-8 flex items-center z-50">
       <div className="w-full max-w-7xl mx-auto flex items-center">
-        {/* Logo container - maintaining original sizing */}
+        {/* Logo container - responsive sizing */}
         <div className="h-full flex items-center">
           <Link 
             href="/" 
@@ -38,16 +38,16 @@ const Header = () => {
         <div className="flex-grow"/>
 
         {/* Auth buttons container */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
           <Unauthenticated>
-            <div className="flex gap-6 items-center">
+            <div className="flex gap-2 sm:gap-4 lg:gap-6 items-center">
               <SignInButton>
-                <Button className="px-5 py-2 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700">
+                <Button className="px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-700">
                   Sign In
                 </Button>
               </SignInButton>
               <SignUpButton>
-                <Button variant="outline" className="px-5 py-2 rounded-xl text-sm font-semibold">
+                <Button variant="outline" className="px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold">
                   Sign Up
                 </Button>
               </SignUpButton>
@@ -55,11 +55,11 @@ const Header = () => {
           </Unauthenticated>
 
           <Authenticated>
-            <div className="flex items-center gap-10">
+            <div className="flex items-center gap-4 sm:gap-6 lg:gap-10">
               <Link href="/dashboard">
-                <Button variant="outline" className="gap-2 px-5 py-2 rounded-xl text-black font-semibold">
+                <Button variant="outline" className="gap-1.5 sm:gap-2 px-2 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm text-black font-semibold">
                   <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
+                  <span>Dashboard</span>
                 </Button>
               </Link>
               <UserButton afterSignOutUrl="/" />

@@ -40,9 +40,9 @@ export default function ContactsPage() {
   if (!isLoaded) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4">
           <BarLoader color="#3b82f6" width={200} />
-          <p className="text-gray-600 font-medium">Loading...</p>
+          <p className="text-gray-600 font-medium text-sm sm:text-base">Loading...</p>
         </div>
       </div>
     );
@@ -52,9 +52,9 @@ export default function ContactsPage() {
   if (!isSignedIn) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-red-50 to-rose-50">
-        <div className="text-center space-y-4 p-8 bg-white rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Please Sign In</h1>
-          <p className="text-gray-600">You need to be authenticated to view contacts.</p>
+        <div className="text-center space-y-3 sm:space-y-4 p-6 sm:p-8 bg-white rounded-lg shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Please Sign In</h1>
+          <p className="text-gray-600 text-sm sm:text-base">You need to be authenticated to view contacts.</p>
         </div>
       </div>
     );
@@ -64,9 +64,9 @@ export default function ContactsPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4">
           <BarLoader color="#3b82f6" width={200} />
-          <p className="text-gray-600 font-medium">Loading contacts...</p>
+          <p className="text-gray-600 font-medium text-sm sm:text-base">Loading contacts...</p>
         </div>
       </div>
     );
@@ -76,9 +76,9 @@ export default function ContactsPage() {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-red-50 to-rose-50">
-        <div className="text-center space-y-4 p-8 bg-white rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold text-red-600 mb-4">Error Loading Contacts</h1>
-          <p className="text-gray-600">{error.message}</p>
+        <div className="text-center space-y-3 sm:space-y-4 p-6 sm:p-8 bg-white rounded-lg shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold text-red-600 mb-3 sm:mb-4">Error Loading Contacts</h1>
+          <p className="text-gray-600 text-sm sm:text-base">{error.message}</p>
         </div>
       </div>
     );
@@ -88,60 +88,60 @@ export default function ContactsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl space-y-6 sm:space-y-8">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Contacts</h1>
           <Button 
             onClick={() => setIsNewGroupModalOpen(true)} 
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg"
+            className="flex items-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 shadow-lg"
           >
-            <PlusIcon className="w-4 h-4" />
+            <PlusIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             New Group
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8"> 
                      {/* People Section */}
-           <div className="space-y-6">
+           <div className="space-y-4 sm:space-y-6">
              <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-               <CardContent className="p-6">
-                 <div className="flex items-center gap-3 mb-4">
-                   <div className="p-2 bg-purple-100 rounded-lg">
-                     <User className="w-5 h-5 text-purple-600" />
+               <CardContent className="p-4 sm:p-6">
+                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                   <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
+                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                    </div>
-                   <h2 className="text-xl font-semibold text-gray-800">People</h2>
-                   <span className="ml-auto text-sm font-medium text-gray-600 bg-white px-3 py-1 rounded-full">
+                   <h2 className="text-lg sm:text-xl font-semibold text-gray-800">People</h2>
+                   <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
                      {users.length} {users.length === 1 ? 'contact' : 'contacts'}
                    </span>
                  </div>
 
                 {users.length === 0 ? (
-                                     <div className="text-center py-12 space-y-3">
-                     <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-                       <User className="w-8 h-8 text-purple-500" />
+                                     <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
+                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+                       <User className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
                      </div>
-                    <p className="text-gray-500 font-medium">No contacts yet</p>
-                    <p className="text-sm text-gray-400">Start by adding some friends to split expenses with</p>
+                    <p className="text-gray-500 font-medium text-sm sm:text-base">No contacts yet</p>
+                    <p className="text-xs sm:text-sm text-gray-400">Start by adding some friends to split expenses with</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {users.map((user: any) => {
                       const userColor = getUserColor(user.id);
                       return (
                         <Link key={user.id} href={`/user/${user.id}`} className="block">
                           <Card className="hover:shadow-md transition-all duration-200 border-0 bg-white hover:bg-gradient-to-r hover:from-white hover:to-purple-50">
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
-                                <Avatar className={`w-12 h-12 ring-2 ${userColor.ring}`}>
+                            <CardContent className="p-3 sm:p-4">
+                              <div className="flex items-center gap-3 sm:gap-4">
+                                <Avatar className={`w-10 h-10 sm:w-12 sm:h-12 ring-2 ${userColor.ring}`}>
                                   <AvatarImage src={user.imageUrl} />
-                                  <AvatarFallback className={`flex items-center justify-center ${userColor.bg} ${userColor.text} font-semibold w-full h-full`}>
+                                  <AvatarFallback className={`flex items-center justify-center ${userColor.bg} ${userColor.text} font-semibold w-full h-full text-sm sm:text-base`}>
                                     {user.name.charAt(0)}
                                   </AvatarFallback>
                                 </Avatar>
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 truncate">{user.name}</p>
-                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                <p className="font-semibold text-gray-900 truncate text-sm sm:text-base">{user.name}</p>
+                                <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
                               </div>
                             </div>
                           </CardContent>
@@ -156,40 +156,40 @@ export default function ContactsPage() {
           </div>
 
                      {/* Groups Section */}
-           <div className="space-y-6">
+           <div className="space-y-4 sm:space-y-6">
              <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-               <CardContent className="p-6">
-                 <div className="flex items-center gap-3 mb-4">
-                   <div className="p-2 bg-orange-100 rounded-lg">
-                     <Users className="w-5 h-5 text-orange-600" />
+               <CardContent className="p-4 sm:p-6">
+                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                   <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
+                     <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                    </div>
-                   <h2 className="text-xl font-semibold text-gray-800">Groups</h2>
-                   <span className="ml-auto text-sm font-medium text-gray-600 bg-white px-3 py-1 rounded-full">
+                   <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Groups</h2>
+                   <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
                      {groups.length} {groups.length === 1 ? 'group' : 'groups'}
                    </span>
                  </div>
 
                 {groups.length === 0 ? (
-                                     <div className="text-center py-12 space-y-3">
-                     <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
-                       <Users className="w-8 h-8 text-orange-500" />
+                                     <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
+                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                       <Users className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
                      </div>
-                    <p className="text-gray-500 font-medium">No groups yet</p>
-                    <p className="text-sm text-gray-400">Create a group to organize expenses with multiple people</p>
+                    <p className="text-gray-500 font-medium text-sm sm:text-base">No groups yet</p>
+                    <p className="text-xs sm:text-sm text-gray-400">Create a group to organize expenses with multiple people</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {groups.map((group: any) => (
                       <Link key={group.id} href={`/groups/${group.id}`} className="block">
                         <Card className="hover:shadow-md transition-all duration-200 border-0 bg-white hover:bg-gradient-to-r hover:from-white hover:to-orange-50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center justify-center bg-orange-100 rounded-full w-12 h-12 ring-2 ring-orange-50">
-                                <Users className="w-5 h-5 text-orange-600" />
+                          <CardContent className="p-3 sm:p-4">
+                            <div className="flex items-center gap-3 sm:gap-4">
+                              <div className="flex items-center justify-center bg-orange-100 rounded-full w-10 h-10 sm:w-12 sm:h-12 ring-2 ring-orange-50">
+                                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 truncate">{group.name}</p>
-                                <p className="text-sm text-gray-500">
+                                <p className="font-semibold text-gray-900 truncate text-sm sm:text-base">{group.name}</p>
+                                <p className="text-xs sm:text-sm text-gray-500">
                                   {group.memberCount} {group.memberCount === 1 ? 'member' : 'members'}
                                 </p>
                               </div>

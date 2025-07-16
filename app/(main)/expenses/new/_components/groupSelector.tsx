@@ -38,7 +38,7 @@ const GroupSelector = ({onChange}: {onChange: (group: Group) => void}) => {
 
   if(!data?.groups || data.groups.length === 0) {
     return(
-      <div>
+      <div className="text-sm text-gray-600 font-medium">
         You don't have any groups yet. Create a new group to get started.
       </div>
     )
@@ -49,7 +49,7 @@ const GroupSelector = ({onChange}: {onChange: (group: Group) => void}) => {
       <select 
         value={selectedGroupId} 
         onChange={(e) => handleGroupChange(e.target.value)}
-        className="w-full h-12 px-4 py-3 text-sm border rounded-md focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 bg-white/80 border-purple-200 font-medium"
+        className="w-full h-10 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-sm border rounded-md focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 bg-white/80 border-purple-200 font-medium"
       >
         <option value="">Select a group</option>
         {data.groups.map((group: {id: string; name: string; memberCount: number}) => (
@@ -62,7 +62,7 @@ const GroupSelector = ({onChange}: {onChange: (group: Group) => void}) => {
       {loading && selectedGroupId && (
         <div className="flex items-center gap-2 mt-2">
           <BarLoader height={2} width={50} />
-          <span className="text-sm text-gray-600 font-medium">Loading group members...</span>
+          <span className="text-xs sm:text-sm text-gray-600 font-medium">Loading group members...</span>
         </div>
       )}
     </div>

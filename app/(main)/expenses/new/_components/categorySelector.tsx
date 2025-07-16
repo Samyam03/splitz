@@ -34,7 +34,7 @@ const CategorySelector = ({categories, onChange}: {categories: {id: string; name
     <select 
       value={selectedCategory} 
       onChange={(e) => handleCategoryChange(e.target.value)}
-      className="w-full h-12 px-4 py-3 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 bg-white/80 border-blue-200 font-medium"
+      className="w-full h-10 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 bg-white/80 border-blue-200 font-medium"
     >
       <option value="">Select a category</option>
       {categories.map((category)=> (

@@ -19,41 +19,41 @@ interface IndividualExpensesProps {
 const IndividualExpenses = ({ expenses }: IndividualExpensesProps) => {
     if(!expenses || expenses.length === 0){
         return (
-            <div className="text-center py-8 space-y-4 flex flex-col justify-center h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-                    <Receipt className="w-7 h-7 text-white" />
+            <div className="text-center py-6 sm:py-8 space-y-3 sm:space-y-4 flex flex-col justify-center h-full">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+                    <Receipt className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
                 <div>
-                    <p className="text-gray-700 font-bold text-base">No individual expenses</p>
-                    <p className="text-sm text-gray-500 mt-2">Create expenses outside of groups to see them here</p>
+                    <p className="text-gray-700 font-bold text-sm sm:text-base">No individual expenses</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Create expenses outside of groups to see them here</p>
                 </div>
             </div>
         )
     }
     
     return (
-        <div className="space-y-2.5 h-full overflow-y-auto">
+        <div className="space-y-2 sm:space-y-2.5 h-full overflow-y-auto">
             {expenses.map((expense) => {
                 const isPaid = expense.status === 'paid';
                 const isYouPaid = expense.paidBy === 'You' || expense.paidBy === 'Unknown User';
                 
                 return (
                     <Link key={expense.id} href={`/expenses/${expense.id}`} className="block group">
-                        <div className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-blue-50/60 hover:from-blue-50 hover:to-indigo-50 rounded-xl border border-blue-200/50 hover:border-blue-300/70 p-4 group-hover:scale-[1.02]">
+                        <div className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-blue-50/60 hover:from-blue-50 hover:to-indigo-50 rounded-xl border border-blue-200/50 hover:border-blue-300/70 p-3 sm:p-4 group-hover:scale-[1.02]">
                             <div className="flex items-start justify-between">
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <h4 className="font-bold text-gray-900 truncate text-sm leading-tight group-hover:text-blue-800 transition-colors">
+                                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                                        <h4 className="font-bold text-gray-900 truncate text-xs sm:text-sm leading-tight group-hover:text-blue-800 transition-colors">
                                             {expense.description}
                                         </h4>
                                         {isPaid ? (
-                                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
                                         ) : (
-                                            <Clock className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                                            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500 flex-shrink-0" />
                                         )}
                                     </div>
                                     
-                                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-gray-600">
                                         <div className="flex items-center gap-1">
                                             <User className="w-3 h-3" />
                                             <span className="truncate font-semibold">
@@ -69,11 +69,11 @@ const IndividualExpenses = ({ expenses }: IndividualExpensesProps) => {
                                     </div>
                                 </div>
                                 
-                                <div className="text-right flex-shrink-0 ml-4">
-                                    <div className="text-sm font-bold text-gray-900">
+                                <div className="text-right flex-shrink-0 ml-2 sm:ml-4">
+                                    <div className="text-xs sm:text-sm font-bold text-gray-900">
                                         ${expense.amount.toFixed(2)}
                                     </div>
-                                    <div className={`text-xs font-bold px-2 py-1 rounded-full mt-1 ${
+                                    <div className={`text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full mt-1 ${
                                         isPaid 
                                             ? 'text-green-700 bg-green-100' 
                                             : 'text-orange-700 bg-orange-100'
