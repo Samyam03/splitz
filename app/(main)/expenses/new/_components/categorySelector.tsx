@@ -2,20 +2,7 @@
 import React, { useEffect, useState } from 'react'
 
 const CategorySelector = ({categories, onChange}: {categories: {id: string; name: string; icon: React.ReactNode; isDefault?: boolean}[]; onChange: (category: string) => void}) => {
-  
   const [selectedCategory, setSelectedCategory] = useState("");
-
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    
-    if(onChange && categoryId !== selectedCategory) {
-      onChange(categoryId);
-    }
-  }
-
-  if(!categories || categories.length === 0) {
-    return <div className="text-sm text-gray-600 font-medium">No categories found</div>
-  }
 
   useEffect(() => {
     if (!selectedCategory && categories.length > 0) {
@@ -28,6 +15,18 @@ const CategorySelector = ({categories, onChange}: {categories: {id: string; name
       }, 100);
     }
   }, [selectedCategory, categories, onChange]);
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    
+    if(onChange && categoryId !== selectedCategory) {
+      onChange(categoryId);
+    }
+  }
+
+  if (!categories || categories.length === 0) {
+    return <div className="text-sm text-gray-600 font-medium">No categories found</div>;
+  }
 
   return (
     <select 

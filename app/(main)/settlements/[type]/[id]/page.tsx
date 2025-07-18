@@ -18,20 +18,7 @@ import { toast } from 'sonner'
 import SettlementsList from '@/components/settlementsList'
 import { Id } from '@/convex/_generated/dataModel'
 
-// Add types for settlementData
-type UserCounterpart = {
-  userId: Id<'users'>;
-  name?: string;
-  imageUrl?: string;
-  email?: string | null;
-};
-type UserSettlementData = {
-  type: 'user';
-  counterpart: UserCounterpart;
-  youAreOwed: number;
-  youOwe: number;
-  netBalance: number;
-};
+// Restore type GroupMemberBalance for use in the file:
 type GroupMemberBalance = {
   userId: string;
   name: string;
@@ -40,15 +27,6 @@ type GroupMemberBalance = {
   youAreOwed: number;
   youOwe: number;
   netBalance: number;
-};
-type GroupSettlementData = {
-  type: 'group';
-  group: {
-    id: Id<'groups'>;
-    name?: string;
-    description?: string;
-  };
-  balances: GroupMemberBalance[];
 };
 
 const SettlementPage = () => {
