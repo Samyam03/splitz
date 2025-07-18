@@ -69,7 +69,7 @@ const ExpenseList = ({
       </Card> 
     )
   }
-  const getUserDetails = (userId:string, expense?: Expense)=>{
+  const getUserDetails = (userId:string)=>{
         return{
           name:
           userId === currentUser.data?._id ? "You" : userLookUpMap[userId]?.name|| "Other User",
@@ -94,7 +94,7 @@ const ExpenseList = ({
             expenseId: expense._id as Id<"expenses">
           })
           toast.success("Expense deleted successfully")
-        } catch(error){
+        } catch{
           toast.error("Failed to delete expense")
         }
   }
@@ -102,9 +102,8 @@ const ExpenseList = ({
   return (
     <div className="space-y-2 sm:space-y-4">
       {expenses.map((expense)=>{
-          const payer = getUserDetails(expense.paidByUserId, expense)
+          const payer = getUserDetails(expense.paidByUserId)
           const isCurrentUserPayer = expense.paidByUserId === currentUser.data?._id
-          const category = getCategoryById(expense.category)
           const CategoryIcon = getCategoryIcon(expense.category)
           const showDeleteButton = canDeleteExpense(expense)
           
@@ -191,7 +190,7 @@ const ExpenseList = ({
                       {/* Users on the left */}
                       <div className="flex flex-wrap gap-1 sm:gap-1.5 flex-1">
                         {expense.splits?.map((split)=>{
-                          const splitUser = getUserDetails(split.userId, expense)
+                          const splitUser = getUserDetails(split.userId)
                           const isCurrentUser = split.userId === currentUser.data?._id
 
                           return(
