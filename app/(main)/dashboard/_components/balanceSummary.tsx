@@ -59,7 +59,7 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
             </div>
           </div>
           <div className="space-y-1 sm:space-y-1.5 max-h-24 sm:max-h-32 overflow-y-auto">
-            {youAreOwed.map((item:any)=>{
+            {youAreOwed.map((item: BalanceDetails)=>{
               const userColor = getUserColor(item.userId);
               return (
                 <Link 
@@ -98,7 +98,7 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
             </div>
           </div>
           <div className="space-y-1 sm:space-y-1.5 max-h-24 sm:max-h-32 overflow-y-auto">
-            {youOwe.map((item:any)=>{
+            {youOwe.map((item: BalanceDetails)=>{
               const userColor = getUserColor(item.userId);
               return (
                 <Link 

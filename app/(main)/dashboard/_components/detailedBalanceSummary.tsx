@@ -56,7 +56,7 @@ const DetailedBalanceSummary = ({ balances }: DetailedBalanceSummaryProps) => {
             </div>
             <div className="space-y-1.5 sm:space-y-2 flex-1 overflow-y-auto pr-1">
               {hasOwed ? (
-                youAreOwed.map((item:any)=>{
+                youAreOwed.map((item: BalanceDetails)=>{
                   const userColor = getUserColor(item.userId);
                   return (
                     <div 
@@ -116,7 +116,7 @@ const DetailedBalanceSummary = ({ balances }: DetailedBalanceSummaryProps) => {
             </div>
             <div className="space-y-1.5 sm:space-y-2 flex-1 overflow-y-auto pr-1">
               {hasOwing ? (
-                youOwe.map((item:any)=>{
+                youOwe.map((item: BalanceDetails)=>{
                   const userColor = getUserColor(item.userId);
                   return (
                     <div 

@@ -7,7 +7,6 @@ import { Badge } from './ui/badge';
 import { getUserColor } from '@/lib/userColors';
 import { Crown, User } from 'lucide-react';
 import Link from 'next/link';
-import { Id } from '@/convex/_generated/dataModel';
 
 type GroupMember = {
   id: string;

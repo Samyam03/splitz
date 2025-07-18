@@ -6,7 +6,6 @@ import { ArrowUp, ArrowDown } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { getUserColor } from '@/lib/userColors';
-import { Id } from '@/convex/_generated/dataModel';
 
 type OwedBy = { from: string; amount: number };
 type OwedTo = { to: string; amount: number };
@@ -146,7 +145,7 @@ const GroupBalances = ({balances}: {balances: GroupBalance[]}) => {
                   </div>
                 </div>
                 <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
-                  {owedByMembers.map((item:any)=>{
+                  {owedByMembers.map((item: GroupBalance & {amount: number})=>{
                     const userColor = getUserColor(item.id);
                     return (
                       <Link 
@@ -189,7 +188,7 @@ const GroupBalances = ({balances}: {balances: GroupBalance[]}) => {
                  </div>
                </div>
                <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
-                 {owedToMembers.map((item:any)=>{
+                 {owedToMembers.map((item: GroupBalance & {amount: number})=>{
                    const userColor = getUserColor(item.id);
                    return (
                      <Link 

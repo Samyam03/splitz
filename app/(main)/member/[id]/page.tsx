@@ -21,13 +21,39 @@ import ExpenseList from "@/components/expenseList";
 import { getUserColor } from "@/lib/userColors";
 import { Id } from '@/convex/_generated/dataModel';
 
+type Expense = {
+  _id: string;
+  amount: number;
+  description: string;
+  paidByUserId: string;
+  date: number;
+  category: string;
+  createdBy: string;
+  splits: Array<{
+    userId: string;
+    amount: number;
+    paid: boolean;
+  }>;
+};
+
+type Settlement = {
+  id: string;
+  _id?: string;
+  amount: number;
+  note?: string;
+  paidByUserId: string;
+  receivedByUserId: string;
+  createdBy: string;
+  date: number;
+};
+
 type GroupBreakdown = {
   groupId: Id<'groups'>;
   groupName: string;
   groupDescription?: string;
   balance: number;
-  expenses: any[];
-  settlements: any[];
+  expenses: Expense[];
+  settlements: Settlement[];
 };
 
 const MemberPage = () => {
@@ -275,15 +301,15 @@ const MemberPage = () => {
             <TabsContent value="expenses" className="space-y-2 sm:space-y-4">
               {(() => {
                 // Combine all expenses from all groups
-                const allExpenses = groupBreakdowns.flatMap((group: any) => 
-                  group.expenses.map((expense: any) => ({
+                const allExpenses = groupBreakdowns.flatMap((group: GroupBreakdown) =>
+                  group.expenses.map((expense: Expense) => ({
                     ...expense,
                     groupName: group.groupName
                   }))
                 );
                 
-                const allSettlements = groupBreakdowns.flatMap((group: any) => 
-                  group.settlements.map((settlement: any) => ({
+                const allSettlements = groupBreakdowns.flatMap((group: GroupBreakdown) =>
+                  group.settlements.map((settlement: Settlement) => ({
                     ...settlement,
                     groupName: group.groupName
                   }))

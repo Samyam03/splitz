@@ -9,21 +9,6 @@ import { Button } from './ui/button'
 import { toast } from 'sonner'
 import { Id } from '@/convex/_generated/dataModel'
 
-interface Expense {
-  id: string
-  amount: number
-  description: string
-  paidByUserId: string
-  date: string
-  category: string
-  createdBy: string
-  split: Array<{
-    userId: string
-    amount: number
-  }>
-  // Add other expense properties as needed
-}
-
 type Settlement = {
   id: string
   _id?: string

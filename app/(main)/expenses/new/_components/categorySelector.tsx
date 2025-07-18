@@ -18,12 +18,11 @@ const CategorySelector = ({categories, onChange}: {categories: {id: string; name
   }
 
   useEffect(() => {
-    if(!selectedCategory && categories.length > 0) {
-      const defaultCategory = categories.find((category)=> category.isDefault)|| categories[0];
-  
+    if (!selectedCategory && categories.length > 0) {
+      const defaultCategory = categories.find((category) => category.isDefault) || categories[0];
       setTimeout(() => {
         setSelectedCategory(defaultCategory.id);
-        if(onChange) {
+        if (onChange) {
           onChange(defaultCategory.id);
         }
       }, 100);

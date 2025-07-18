@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useConvexQuery } from '@/hooks/useConvexQuery'
 import { api } from '@/convex/_generated/api'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'

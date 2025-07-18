@@ -50,7 +50,6 @@ type GroupSettlementData = {
   };
   balances: GroupMemberBalance[];
 };
-type SettlementData = UserSettlementData | GroupSettlementData;
 
 const SettlementPage = () => {
     const params = useParams()
@@ -306,8 +305,8 @@ const SettlementPage = () => {
                     </h4>
                     <div className="space-y-2 max-h-[250px] sm:max-h-[300px] overflow-y-auto">
                       {settlementData.balances
-                        .filter((balance: any) => balance.userId !== currentUser?._id)
-                        .map((balance: any) => {
+                        .filter((balance: GroupMemberBalance) => balance.userId !== currentUser?._id)
+                        .map((balance: GroupMemberBalance) => {
                           const userColor = getUserColor(balance.userId)
                           return (
                             <div key={balance.userId} className="flex items-center justify-between p-2 sm:p-3 bg-white rounded-lg border">
@@ -392,8 +391,8 @@ const SettlementPage = () => {
                       >
                         <option value="">Select a group member...</option>
                         {settlementData.balances
-                          .filter((balance: any) => balance.userId !== currentUser?._id)
-                          .map((balance: any) => (
+                          .filter((balance: GroupMemberBalance) => balance.userId !== currentUser?._id)
+                          .map((balance: GroupMemberBalance) => (
                             <option key={balance.userId} value={balance.userId}>
                               {balance.name} ({balance.netBalance > 0 ? `+$${balance.netBalance.toFixed(2)}` : balance.netBalance < 0 ? `$${balance.netBalance.toFixed(2)}` : 'Settled'})
                             </option>
