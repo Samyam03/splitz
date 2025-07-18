@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useConvexQuery } from '@/hooks/useConvexQuery';
 import { api } from '../../../convex/_generated/api';
 import { BarLoader } from 'react-spinners';
@@ -32,7 +32,7 @@ type ContactGroup = {
   type: 'group';
 };
 
-export default function ContactsPage() {
+function ContactsPageContent() {
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
 
   const { isLoaded, isSignedIn } = useAuth();
@@ -119,25 +119,25 @@ export default function ContactsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8"> 
-                     {/* People Section */}
-           <div className="space-y-4 sm:space-y-6">
-             <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
-               <CardContent className="p-4 sm:p-6">
-                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                   <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
-                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                   </div>
-                   <h2 className="text-lg sm:text-xl font-semibold text-gray-800">People</h2>
-                   <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
-                     {users.length} {users.length === 1 ? 'contact' : 'contacts'}
-                   </span>
-                 </div>
+          {/* People Section */}
+          <div className="space-y-4 sm:space-y-6">
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-emerald-50">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">People</h2>
+                  <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
+                    {users.length} {users.length === 1 ? 'contact' : 'contacts'}
+                  </span>
+                </div>
 
                 {users.length === 0 ? (
-                                     <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
-                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-                       <User className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
-                     </div>
+                  <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+                      <User className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+                    </div>
                     <p className="text-gray-500 font-medium text-sm sm:text-base">No contacts yet</p>
                     <p className="text-xs sm:text-sm text-gray-400">Start by adding some friends to split expenses with</p>
                   </div>
@@ -156,41 +156,41 @@ export default function ContactsPage() {
                                     {user.name.charAt(0)}
                                   </AvatarFallback>
                                 </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 truncate text-sm sm:text-base">{user.name}</p>
-                                <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-semibold text-gray-900 truncate text-sm sm:text-base">{user.name}</p>
+                                  <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
+                                </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    );
-                  })}
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
 
-                     {/* Groups Section */}
-           <div className="space-y-4 sm:space-y-6">
-             <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-               <CardContent className="p-4 sm:p-6">
-                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                   <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
-                     <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
-                   </div>
-                   <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Groups</h2>
-                   <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
-                     {groups.length} {groups.length === 1 ? 'group' : 'groups'}
-                   </span>
-                 </div>
+          {/* Groups Section */}
+          <div className="space-y-4 sm:space-y-6">
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Groups</h2>
+                  <span className="ml-auto text-xs sm:text-sm font-medium text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
+                    {groups.length} {groups.length === 1 ? 'group' : 'groups'}
+                  </span>
+                </div>
 
                 {groups.length === 0 ? (
-                                     <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
-                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
-                       <Users className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
-                     </div>
+                  <div className="text-center py-8 sm:py-12 space-y-2 sm:space-y-3">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                      <Users className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
+                    </div>
                     <p className="text-gray-500 font-medium text-sm sm:text-base">No groups yet</p>
                     <p className="text-xs sm:text-sm text-gray-400">Create a group to organize expenses with multiple people</p>
                   </div>
@@ -232,5 +232,20 @@ export default function ContactsPage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function ContactsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <BarLoader color="#3b82f6" width={200} />
+          <p className="text-gray-600 font-medium text-sm sm:text-base">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ContactsPageContent />
+    </Suspense>
   );
 }
