@@ -74,10 +74,10 @@ const SettlementsList = ({
     )
   }
   
-  const getUserDetails = (userId:string, expense?: Expense)=>{
-    return{
+  const getUserDetails = (userId: string) => {
+    return {
       name:
-      userId === currentUser.data?._id ? "You" : userLookUpMap[userId]?.name|| "Other User",
+        userId === currentUser.data?._id ? "You" : userLookUpMap[userId]?.name || "Other User",
       id: userId,
       imageUrl: userLookUpMap[userId]?.imageUrl || ""
     }
@@ -101,8 +101,12 @@ const SettlementsList = ({
     try {
       await deleteSettlement.mutate({ settlementId: settlementId as Id<'settlements'> })
       toast.success('Settlement deleted successfully!')
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to delete settlement')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || 'Failed to delete settlement')
+      } else {
+        toast.error('Failed to delete settlement')
+      }
     } finally {
       setDeletingSettlements(prev => {
         const newSet = new Set(prev)
