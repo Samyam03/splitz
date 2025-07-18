@@ -39,7 +39,7 @@ const GroupSelector = ({onChange}: {onChange: (group: Group) => void}) => {
   if(!data?.groups || data.groups.length === 0) {
     return(
       <div className="text-sm text-gray-600 font-medium">
-        You don't have any groups yet. Create a new group to get started.
+        You don&apos;t have any groups yet. Create a new group to get started.
       </div>
     )
   }

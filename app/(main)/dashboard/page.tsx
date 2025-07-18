@@ -2,15 +2,12 @@
 import React from "react";
 import { api } from "@/convex/_generated/api";
 import { useConvexQuery } from "@/hooks/useConvexQuery";
-import BarLoader from "react-spinners/BarLoader";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, PlusCircle, Users, User, Receipt, BarChart3   } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import ExpenseSummary from "./_components/expenseSummary";
 import BalanceSummary from "./_components/balanceSummary";
 import DetailedBalanceSummary from "./_components/detailedBalanceSummary";
-import IndividualExpenses from "./_components/individualExpenses";
 import GroupList from "./_components/groupList";
 import MemberList from "./_components/memberList";
 
@@ -32,10 +29,6 @@ const DashboardPage = () => {
     api.dashboard.getMemberBalances
   );
 
-  const { data: individualExpenses, loading: individualExpensesLoading } = useConvexQuery(
-    api.dashboard.getIndividualExpenses
-  );
-
   const { data: totalSpent, loading: totalSpentLoading } = useConvexQuery(
     api.dashboard.getTotalSpent
   );
@@ -48,7 +41,6 @@ const DashboardPage = () => {
     advancedBreakdownLoading ||
     groupsLoading ||
     memberBalancesLoading ||
-    individualExpensesLoading ||
     totalSpentLoading ||
     monthlySpendingLoading;
 

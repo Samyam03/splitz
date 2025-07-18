@@ -3,8 +3,6 @@ import React from 'react'
 import {
   SignInButton,
   SignUpButton,
-  SignedIn,
-  SignedOut,
   UserButton,
 } from '@clerk/nextjs'
 import { Authenticated, Unauthenticated } from 'convex/react'

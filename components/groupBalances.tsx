@@ -6,8 +6,20 @@ import { ArrowUp, ArrowDown } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { getUserColor } from '@/lib/userColors';
+import { Id } from '@/convex/_generated/dataModel';
 
-const GroupBalances = ({balances}: {balances: any}) => {
+type OwedBy = { from: string; amount: number };
+type OwedTo = { to: string; amount: number };
+type GroupBalance = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  totalBalance: number;
+  owedBy?: OwedBy[];
+  owes?: OwedTo[];
+};
+
+const GroupBalances = ({balances}: {balances: GroupBalance[]}) => {
     const {data: currentUser} = useConvexQuery(api.users.getUser);
     
     if (!balances?.length || !currentUser) {
@@ -24,7 +36,7 @@ const GroupBalances = ({balances}: {balances: any}) => {
         );
     }
 
-    const myBalance = balances.find((balance: any) => balance.id === currentUser?._id);
+    const myBalance = balances.find((balance: GroupBalance) => balance.id === currentUser?._id);
     
     if (!myBalance) {
         return (
@@ -40,11 +52,11 @@ const GroupBalances = ({balances}: {balances: any}) => {
         );
     }
   
-    const userMap = Object.fromEntries(balances.map((balance:any) => [balance.id, balance]))
+    const userMap = Object.fromEntries(balances.map((balance: GroupBalance) => [balance.id, balance]))
 
-    const owedByMembers = myBalance.owedBy?.map(({from, amount}: {from: string, amount: number})=>({...userMap[from], amount})).filter((item: any) => item.id).sort((a: any, b: any)=> b.amount - a.amount) || []
+    const owedByMembers = myBalance.owedBy?.map(({from, amount}: OwedBy)=>({...userMap[from], amount})).filter((item: GroupBalance & {amount: number}) => item.id).sort((a, b)=> b.amount - a.amount) || []
     
-    const owedToMembers = myBalance.owes?.map(({to, amount}: {to: string, amount: number})=>({...userMap[to], amount})).filter((item: any) => item.id).sort((a: any, b: any)=> b.amount - a.amount) || []
+    const owedToMembers = myBalance.owes?.map(({to, amount}: OwedTo)=>({...userMap[to], amount})).filter((item: GroupBalance & {amount: number}) => item.id).sort((a, b)=> b.amount - a.amount) || []
     
     const isAllSettledUp = myBalance.totalBalance ===0 && owedByMembers?.length ===0 && owedToMembers?.length ===0
 
@@ -104,7 +116,7 @@ const GroupBalances = ({balances}: {balances: any}) => {
                             ? "You are owed money overall"
                             : myBalance.totalBalance < 0 
                                 ? "You owe money overall"
-                                : "You're all settled up"
+                                : "You&apos;re all settled up"
                         }
                     </p>
                 </div>
@@ -117,7 +129,7 @@ const GroupBalances = ({balances}: {balances: any}) => {
                 </div>
                 <div>
                     <p className="text-green-700 font-semibold text-xs sm:text-sm">All settled up!</p>
-                    <p className="text-xs text-green-600 mt-1">You don't owe anyone and nobody owes you in this group</p>
+                    <p className="text-xs text-green-600 mt-1">You don&apos;t owe anyone and nobody owes you in this group</p>
                 </div>
             </div>
            ): (

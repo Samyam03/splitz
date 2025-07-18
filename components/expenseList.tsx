@@ -27,19 +27,24 @@ interface Expense {
   // Add other expense properties as needed
 }
 
+interface UserLookUp {
+  [userId: string]: {
+    name: string;
+    imageUrl?: string;
+  };
+}
+
 interface ExpenseListProps {
   expenses: Expense[]
   showOtherPerson?: boolean
   isGroupExpense?: boolean
-  otherUserId?: string | null
-  userLookUpMap?: Record<string, any>
+  userLookUpMap?: UserLookUp
 }
 
 const ExpenseList = ({
   expenses,
   showOtherPerson = true,
   isGroupExpense = false,
-  otherUserId = null,
   userLookUpMap = {},
 }: ExpenseListProps) => {
 
@@ -185,7 +190,7 @@ const ExpenseList = ({
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                       {/* Users on the left */}
                       <div className="flex flex-wrap gap-1 sm:gap-1.5 flex-1">
-                        {expense.splits?.map((split,index)=>{
+                        {expense.splits?.map((split)=>{
                           const splitUser = getUserDetails(split.userId, expense)
                           const isCurrentUser = split.userId === currentUser.data?._id
 

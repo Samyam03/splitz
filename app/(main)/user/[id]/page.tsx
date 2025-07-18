@@ -8,15 +8,7 @@ import { ArrowLeftIcon, ArrowRightLeft, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SettlementsList from "@/components/settlementsList";
 import ExpenseList from "@/components/expenseList";
@@ -163,7 +155,7 @@ const UserPage = () => {
                     <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                     </svg>
-                    <span className="text-xs font-medium">You're owed</span>
+                    <span className="text-xs font-medium">You&apos;re owed</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-red-600">
@@ -207,11 +199,7 @@ const UserPage = () => {
               <ExpenseList 
                 expenses={expenses} 
                 showOtherPerson={false} 
-                otherUserId={params.id as string} 
-                userLookUpMap={{
-                  [otherUser.id]: otherUser,
-                  [currentUser?._id || '']: currentUser
-                }} 
+                userLookUpMap={{[otherUser.id]: otherUser, [currentUser?._id || '']: currentUser}} 
               />
             </TabsContent>
             <TabsContent value="settlements" className="space-y-2 sm:space-y-4">

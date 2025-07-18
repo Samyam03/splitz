@@ -9,8 +9,22 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command'
 import { UserPlus, X, Loader2 } from 'lucide-react'
 import { getUserColor } from '@/lib/userColors'
+import { Id } from '@/convex/_generated/dataModel'
 
-const ParticipantSelector = ({participants, onParticipantsChange}: {participants: any, onParticipantsChange: any}) => {
+// Add types for participants and users
+type Participant = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+};
+type User = {
+  id: Id<'users'>;
+  name: string;
+  email: string | null;
+  imageUrl?: string;
+};
+
+const ParticipantSelector = ({participants, onParticipantsChange}: {participants: Participant[], onParticipantsChange: (participants: Participant[]) => void}) => {
 
   const {data: currentUser} = useConvexQuery(api.users.getUser)
   const [commandOpen, setCommandOpen] = useState(false)
@@ -22,7 +36,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
     { query: searchQuery }
   );
 
-  const addParticipant = (user: any) => {
+  const addParticipant = (user: User) => {
     // Ensure user has a valid ID and required properties
     if (!user || !user.id || !user.name) {
       console.error('Invalid user object:', user);
@@ -30,7 +44,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
     }
     
     // Check if participant already exists
-    if (participants.some((p: any) => p.id === user.id)) {
+    if (participants.some((p: Participant) => p.id === user.id)) {
       return;
     }
     
@@ -45,7 +59,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
   }
 
   const removeParticipant = (userId: string) => {
-    onParticipantsChange(participants.filter((p: any) => p.id !== userId))
+    onParticipantsChange(participants.filter((p: Participant) => p.id !== userId))
   }
 
   
@@ -53,7 +67,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
         {/* Selected Participants */}
-        {participants.map((participant: any, index: number) => {
+        {participants.map((participant: Participant, index: number) => {
           const userColor = getUserColor(participant.id);
           const isCurrentUser = participant.id === currentUser?._id;
           return (
@@ -134,7 +148,7 @@ const ParticipantSelector = ({participants, onParticipantsChange}: {participants
                   )}
                 </CommandEmpty>
                 <CommandGroup heading="Users" className="p-2">
-                  {searchResults?.map((user: any) => {
+                  {searchResults?.map((user: User) => {
                     const userColor = getUserColor(user.id);
                     return (
                       <CommandItem

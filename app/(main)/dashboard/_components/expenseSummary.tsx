@@ -1,17 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import React from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+interface MonthlySpendingItem {
+  month: number;
+  total: number;
+}
 
 interface ExpenseSummaryProps {
-  monthlySpending: any;
-  totalSpent: any;
+  monthlySpending: MonthlySpendingItem[];
+  totalSpent: number;
 }
 
 const ExpenseSummary = ({ monthlySpending, totalSpent }: ExpenseSummaryProps) => {
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    const chartData = monthlySpending?.map((item:any)=>{
+    const chartData = monthlySpending?.map((item: MonthlySpendingItem) => {
         const date = new Date(item.month);
         return {
             month: monthNames[date.getMonth()],
@@ -19,8 +24,12 @@ const ExpenseSummary = ({ monthlySpending, totalSpent }: ExpenseSummaryProps) =>
         }
     }) || [];
 
-    // Custom tooltip component
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    interface CustomTooltipProps {
+      active?: boolean;
+      payload?: { value: number }[];
+      label?: string;
+    }
+    const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-2 sm:p-3 border border-gray-200 rounded-lg shadow-lg">

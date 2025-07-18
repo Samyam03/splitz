@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
-const CategorySelector = ({categories, onChange}: {categories: {id: string; name: string; icon: any; isDefault?: boolean}[]; onChange: (category: string) => void}) => {
+const CategorySelector = ({categories, onChange}: {categories: {id: string; name: string; icon: React.ReactNode; isDefault?: boolean}[]; onChange: (category: string) => void}) => {
   
   const [selectedCategory, setSelectedCategory] = useState("");
 
@@ -28,7 +28,7 @@ const CategorySelector = ({categories, onChange}: {categories: {id: string; name
         }
       }, 100);
     }
-  }, []);
+  }, [selectedCategory, categories, onChange]);
 
   return (
     <select 

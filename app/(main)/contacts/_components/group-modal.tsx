@@ -26,16 +26,12 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
-import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { getUserColor } from "@/lib/userColors";
 
@@ -45,6 +41,13 @@ const groupSchema = z.object({
 });
 
 type FormValues = z.infer<typeof groupSchema>;
+
+interface User {
+  id: Id<"users">;
+  name: string;
+  email: string | null;
+  imageUrl?: string;
+}
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -57,7 +60,7 @@ const CreateGroupModal = ({
   isClose,
   onSuccess,
 }: CreateGroupModalProps) => {
-  const [selectedMembers, setSelectedMembers] = useState<any[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [commandOpen, setCommandOpen] = useState(false);
 
@@ -66,10 +69,9 @@ const CreateGroupModal = ({
     api.users.searchUsers,
     { query: searchQuery }
   );
-  const { data: allUsers } = useConvexQuery(api.users.searchUsers, { query: '' });
   const { mutate: createGroup, loading: isCreatingGroup } = useConvexMutation(api.contacts.createGroup);
 
-  const addMember = (user: any) => {
+  const addMember = (user: User) => {
     if (!selectedMembers.some((member) => member.id === user.id)) {
       setSelectedMembers([...selectedMembers, user]);
     }
@@ -212,7 +214,7 @@ const CreateGroupModal = ({
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   {/* Current User Badge */}
                   {currentUser && (() => {
-                    const currentUserColor = getUserColor(currentUser.id);
+                    const currentUserColor = getUserColor(currentUser.id as Id<'users'>);
                     return (
                       <Badge className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200 hover:from-blue-200 hover:to-indigo-200 transition-all duration-200">
                         <Avatar className={`h-6 w-6 sm:h-8 sm:w-8 ring-2 ${currentUserColor.ring}`}>
@@ -231,7 +233,7 @@ const CreateGroupModal = ({
 
                   {/* Selected Members */}
                   {selectedMembers.map((member) => {
-                    const userColor = getUserColor(member.id);
+                    const userColor = getUserColor(member.id as Id<'users'>);
                     return (
                       <Badge
                         key={member.id}
@@ -245,7 +247,7 @@ const CreateGroupModal = ({
                         </Avatar>
                         <span className="font-semibold text-xs sm:text-sm">{member.name}</span>
                         <Button
-                          onClick={() => removeMember(member.id)}
+                          onClick={() => removeMember(member.id as Id<'users'>)}
                           variant="ghost"
                           size="sm"
                           type="button"
@@ -301,13 +303,13 @@ const CreateGroupModal = ({
                             )}
                           </CommandEmpty>
                           <CommandGroup heading="Users" className="p-2">
-                            {searchResults?.map((user: any) => {
-                              const userColor = getUserColor(user.id);
+                            {searchResults?.map((user: User) => {
+                              const userColor = getUserColor(user.id as Id<'users'>);
                               return (
                                 <CommandItem
                                   key={user.id}
                                   value={`${user.name} ${user.email || ""}`}
-                                  onSelect={() => addMember(user)}
+                                  onSelect={() => addMember({ ...user, id: user.id as Id<'users'> })}
                                   className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200"
                                 >
                                   <Avatar className={`h-6 w-6 sm:h-8 sm:w-8 ring-2 ${userColor.ring}`}>

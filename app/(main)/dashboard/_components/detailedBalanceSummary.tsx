@@ -3,9 +3,22 @@ import { Avatar } from '@/components/ui/avatar';
 import { AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import React from 'react'
 import { getUserColor } from '@/lib/userColors';
+import { Id } from '@/convex/_generated/dataModel';
+
+type BalanceDetails = {
+  userId: Id<'users'> | string;
+  name: string;
+  imageUrl?: string;
+  amount: number;
+};
 
 interface DetailedBalanceSummaryProps {
-  balances: any;
+  balances: {
+    oweDetails: {
+      youAreOwed: BalanceDetails[];
+      youOwe: BalanceDetails[];
+    };
+  };
 }
 
 const DetailedBalanceSummary = ({ balances }: DetailedBalanceSummaryProps) => {
@@ -17,8 +30,8 @@ const DetailedBalanceSummary = ({ balances }: DetailedBalanceSummaryProps) => {
     if (!oweDetails) return null;
 
     // More robust checks for the data
-    const youAreOwed = oweDetails.youAreOwed || [];
-    const youOwe = oweDetails.youOwe || [];
+    const youAreOwed: BalanceDetails[] = oweDetails.youAreOwed || [];
+    const youOwe: BalanceDetails[] = oweDetails.youOwe || [];
     
     const hasOwed = Array.isArray(youAreOwed) && youAreOwed.length > 0;
     const hasOwing = Array.isArray(youOwe) && youOwe.length > 0;
@@ -137,7 +150,7 @@ const DetailedBalanceSummary = ({ balances }: DetailedBalanceSummaryProps) => {
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                       <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                     </div>
-                    <p className="text-gray-700 font-medium text-xs sm:text-sm">You don't owe anyone</p>
+                    <p className="text-gray-700 font-medium text-xs sm:text-sm">You don&apos;t owe anyone</p>
                     <p className="text-xs text-gray-500 mt-1">No outstanding payments</p>
                   </div>
                 </div>

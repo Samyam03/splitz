@@ -1,7 +1,7 @@
 "use client";
 import { CalendarIcon, PandaIcon, Users, Receipt, Calculator, User } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { date, z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConvexMutation, useConvexQuery } from "@/hooks/useConvexQuery";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { format, setDate } from "date-fns";
+import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import ParticipantSelector from "./participantSelector";
 import GroupSelector from "./groupSelector";
@@ -79,7 +79,10 @@ const ExpenseForm = ({
   const { data: currentUser } = useConvexQuery(api.users.getUser);
 
   const createExpense = useConvexMutation(api.expense.createExpense);
-  const categories = getAllCategories();
+  const categories = getAllCategories().map((cat) => ({
+    ...cat,
+    icon: cat.icon ? <cat.icon /> : null,
+  }));
 
   const {
     register,
@@ -306,7 +309,7 @@ const ExpenseForm = ({
                       }));
                       
                       // Always include current user if not already in group
-                      let finalParticipants = [...groupMembers];
+                      const finalParticipants = [...groupMembers];
                       if (currentUser && !groupMembers.some(member => member.id === currentUser._id)) {
                         finalParticipants.unshift({
                           id: currentUser._id,

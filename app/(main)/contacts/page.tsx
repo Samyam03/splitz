@@ -14,6 +14,23 @@ import { useAuth } from '@clerk/nextjs';
 import CreateGroupModal from './_components/group-modal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getUserColor } from '@/lib/userColors';
+import { Id } from '../../../convex/_generated/dataModel';
+
+type ContactUser = {
+  id: Id<'users'>;
+  name: string;
+  email: string | null;
+  imageUrl: string | undefined;
+  type: 'user';
+};
+
+type ContactGroup = {
+  id: Id<'groups'>;
+  name: string;
+  description?: string;
+  memberCount: number;
+  type: 'group';
+};
 
 export default function ContactsPage() {
   const [isNewGroupModalOpen, setIsNewGroupModalOpen] = useState(false);
@@ -126,7 +143,7 @@ export default function ContactsPage() {
                   </div>
                 ) : (
                   <div className="space-y-2 sm:space-y-3">
-                    {users.map((user: any) => {
+                    {users.map((user: ContactUser) => {
                       const userColor = getUserColor(user.id);
                       return (
                         <Link key={user.id} href={`/user/${user.id}`} className="block">
@@ -179,7 +196,7 @@ export default function ContactsPage() {
                   </div>
                 ) : (
                   <div className="space-y-2 sm:space-y-3">
-                    {groups.map((group: any) => (
+                    {groups.map((group: ContactGroup) => (
                       <Link key={group.id} href={`/groups/${group.id}`} className="block">
                         <Card className="hover:shadow-md transition-all duration-200 border-0 bg-white hover:bg-gradient-to-r hover:from-white hover:to-orange-50">
                           <CardContent className="p-3 sm:p-4">

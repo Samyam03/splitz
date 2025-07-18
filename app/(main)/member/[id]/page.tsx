@@ -19,6 +19,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SettlementsList from "@/components/settlementsList";
 import ExpenseList from "@/components/expenseList";
 import { getUserColor } from "@/lib/userColors";
+import { Id } from '@/convex/_generated/dataModel';
+
+type GroupBreakdown = {
+  groupId: Id<'groups'>;
+  groupName: string;
+  groupDescription?: string;
+  balance: number;
+  expenses: any[];
+  settlements: any[];
+};
 
 const MemberPage = () => {
   const params = useParams();
@@ -205,11 +215,11 @@ const MemberPage = () => {
                     <Users className="w-4 h-4 sm:w-8 sm:h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 font-medium text-xs sm:text-base">No shared groups</p>
-                  <p className="text-xs text-gray-400">You don't share any groups with this member</p>
+                  <p className="text-xs text-gray-400">You don&apos;t share any groups with this member</p>
                 </div>
               ) : (
                 <div className="space-y-2.5 sm:space-y-4">
-                  {groupBreakdowns.map((group: any) => (
+                  {groupBreakdowns.map((group: GroupBreakdown) => (
                     <Card key={group.groupId} className={`shadow-md border ${group.balance === 0 ? 'bg-gradient-to-br from-gray-50 to-slate-50' : group.balance > 0 ? 'bg-gradient-to-br from-green-50 to-emerald-50' : 'bg-gradient-to-br from-red-50 to-rose-50'}`}>
                       <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-4">
@@ -291,7 +301,6 @@ const MemberPage = () => {
                       <ExpenseList 
                         expenses={allExpenses} 
                         showOtherPerson={false} 
-                        otherUserId={params.id as string} 
                         userLookUpMap={userLookUpMap}
                       />
                     </div>

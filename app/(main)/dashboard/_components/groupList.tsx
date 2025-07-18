@@ -1,9 +1,24 @@
 import React from 'react'
 import Link from 'next/link'
 import { Users } from 'lucide-react'
+import { Id } from '@/convex/_generated/dataModel'
+
+type GroupWithBalance = {
+  _id: Id<'groups'>;
+  name: string;
+  description?: string;
+  createdBy: Id<'users'>;
+  members: Array<{
+    userId: Id<'users'>;
+    role: string;
+    joinedAt: number;
+  }>;
+  id: Id<'groups'>;
+  balance: number;
+};
 
 interface GroupListProps {
-  groups: any;
+  groups: GroupWithBalance[];
 }
 
 const GroupList = ({ groups }: GroupListProps) => {
@@ -21,7 +36,7 @@ const GroupList = ({ groups }: GroupListProps) => {
     
     return (
         <div className="space-y-1.5 sm:space-y-2">
-            {groups.map((group: any) => {
+            {groups.map((group: GroupWithBalance) => {
                 const balance = group.balance || 0;
                 const hasBalance = balance !== 0;
                 

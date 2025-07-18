@@ -7,8 +7,16 @@ import { Badge } from './ui/badge';
 import { getUserColor } from '@/lib/userColors';
 import { Crown, User } from 'lucide-react';
 import Link from 'next/link';
+import { Id } from '@/convex/_generated/dataModel';
 
-const GroupMembers = ({members}: {members: any}) => {
+type GroupMember = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  role: string;
+};
+
+const GroupMembers = ({members}: {members: GroupMember[]}) => {
 
     const {data: currentUser} = useConvexQuery(api.users.getUser);
 
@@ -20,14 +28,14 @@ const GroupMembers = ({members}: {members: any}) => {
                 </div>
                 <div>
                     <p className="text-gray-700 font-semibold text-xs sm:text-sm">No members found</p>
-                    <p className="text-xs text-gray-500 mt-1">This group doesn't have any members yet</p>
+                    <p className="text-xs text-gray-500 mt-1">This group doesn&apos;t have any members yet</p>
                 </div>
             </div>
         )
     }
   return (
     <div className="space-y-1.5 sm:space-y-3">
-      {members.map((member: any)=>{
+      {members.map((member: GroupMember)=>{
             const isCurrentUser = member.id === currentUser?._id;
             const isAdmin = member.role === "admin";
             const userColor = getUserColor(member.id);

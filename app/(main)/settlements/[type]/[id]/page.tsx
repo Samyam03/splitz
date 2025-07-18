@@ -18,6 +18,40 @@ import { toast } from 'sonner'
 import SettlementsList from '@/components/settlementsList'
 import { Id } from '@/convex/_generated/dataModel'
 
+// Add types for settlementData
+type UserCounterpart = {
+  userId: Id<'users'>;
+  name?: string;
+  imageUrl?: string;
+  email?: string | null;
+};
+type UserSettlementData = {
+  type: 'user';
+  counterpart: UserCounterpart;
+  youAreOwed: number;
+  youOwe: number;
+  netBalance: number;
+};
+type GroupMemberBalance = {
+  userId: string;
+  name: string;
+  imageUrl?: string;
+  email?: string | null;
+  youAreOwed: number;
+  youOwe: number;
+  netBalance: number;
+};
+type GroupSettlementData = {
+  type: 'group';
+  group: {
+    id: Id<'groups'>;
+    name?: string;
+    description?: string;
+  };
+  balances: GroupMemberBalance[];
+};
+type SettlementData = UserSettlementData | GroupSettlementData;
+
 const SettlementPage = () => {
     const params = useParams()
     const router = useRouter()
@@ -80,8 +114,12 @@ const SettlementPage = () => {
       setAmount('')
       setNote('')
       setSelectedReceiver('')
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create settlement')
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('Failed to create settlement')
+      }
     } finally {
       setIsSubmitting(false)
     }

@@ -8,13 +8,21 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, Users } from "lucide-react";
 import Link from "next/link";
 import { ArrowRightLeft, PlusIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SettlementsList from "@/components/settlementsList";
 import ExpenseList from "@/components/expenseList";
 import GroupBalances from "@/components/groupBalances";
 import GroupMembers from "@/components/groupMembers";
+
+// Define Balance type for balances
+type Balance = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  totalBalance: number;
+};
 
 const GroupPage = () => {
   const params = useParams();
@@ -44,9 +52,6 @@ const GroupPage = () => {
   const settlements = data?.settlements || [];
   const balances = data?.balances || [];
   const userLookUpMap = data?.userLookUpMap || {};
-
-  // Find current user's balance for styling purposes
-  const currentUserBalance = balances.find((balance: any) => balance.id === currentUser?._id)?.totalBalance || 0;
 
   return (
     <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-6 space-y-4 sm:space-y-8">
@@ -118,7 +123,7 @@ const GroupPage = () => {
                 </CardHeader>
 
                 <CardContent className="p-4 sm:p-6">
-                    <GroupBalances balances={balances} />
+                    <GroupBalances balances={balances as Balance[]} />
                 </CardContent>
             </Card>
         </div>

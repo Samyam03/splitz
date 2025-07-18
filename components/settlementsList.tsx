@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface Expense {
   id: string
@@ -23,10 +24,28 @@ interface Expense {
   // Add other expense properties as needed
 }
 
+type Settlement = {
+  id: string
+  _id?: string
+  amount: number
+  note?: string
+  paidByUserId: string
+  receivedByUserId: string
+  createdBy: string
+  date: number
+}
+
+type UserLookUp = {
+  [userId: string]: {
+    name: string
+    imageUrl?: string
+  }
+}
+
 interface SettlementsListProps {
-  settlements: any[]
+  settlements: Settlement[]
   isGroupSettlement?: boolean
-  userLookUpMap?: Record<string, any>
+  userLookUpMap?: UserLookUp
 }
 
 const SettlementsList = ({
@@ -64,7 +83,7 @@ const SettlementsList = ({
     }
   }
 
-  const canDeleteSettlement = (settlement: any) => {
+  const canDeleteSettlement = (settlement: Settlement) => {
     if (!currentUser.data?._id) return false
     return (
       settlement.createdBy === currentUser.data._id ||
@@ -80,7 +99,7 @@ const SettlementsList = ({
     setDeletingSettlements(prev => new Set(prev).add(settlementId))
     
     try {
-      await deleteSettlement.mutate({ settlementId: settlementId as any })
+      await deleteSettlement.mutate({ settlementId: settlementId as Id<'settlements'> })
       toast.success('Settlement deleted successfully!')
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete settlement')

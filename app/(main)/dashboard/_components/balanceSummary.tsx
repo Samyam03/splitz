@@ -4,9 +4,22 @@ import { AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import React from 'react'
 import { getUserColor } from '@/lib/userColors';
+import { Id } from '@/convex/_generated/dataModel';
+
+type BalanceDetails = {
+  userId: Id<'users'> | string;
+  name: string;
+  imageUrl?: string;
+  amount: number;
+};
 
 interface BalanceSummaryProps {
-  balances: any;
+  balances: {
+    oweDetails: {
+      youAreOwed: BalanceDetails[];
+      youOwe: BalanceDetails[];
+    };
+  };
 }
 
 const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
@@ -18,8 +31,8 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
     if (!oweDetails) return null;
 
     // More robust checks for the data
-    const youAreOwed = oweDetails.youAreOwed || [];
-    const youOwe = oweDetails.youOwe || [];
+    const youAreOwed: BalanceDetails[] = oweDetails.youAreOwed || [];
+    const youOwe: BalanceDetails[] = oweDetails.youOwe || [];
     
     const hasOwed = Array.isArray(youAreOwed) && youAreOwed.length > 0;
     const hasOwing = Array.isArray(youOwe) && youOwe.length > 0;
@@ -32,7 +45,7 @@ const BalanceSummary = ({ balances }: BalanceSummaryProps) => {
             <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
           </div>
           <p className="text-gray-700 font-medium text-xs sm:text-sm">All settled up!</p>
-          <p className="text-xs text-gray-500 mt-1">You don't owe anyone and nobody owes you</p>
+          <p className="text-xs text-gray-500 mt-1">You don&apos;t owe anyone and nobody owes you</p>
         </div>
       )}
 
