@@ -1,7 +1,7 @@
 import { api } from '@/convex/_generated/api'
 import { useConvexMutation, useConvexQuery } from '@/hooks/useConvexQuery'
 import { Card, CardContent } from './ui/card'
-import { getCategoryById, getCategoryIcon } from '@/lib/expenseCategories'
+import { getCategoryIcon } from '@/lib/expenseCategories'
 import { format } from 'date-fns'
 import { Trash2 } from 'lucide-react'
 import { Badge } from './ui/badge'
