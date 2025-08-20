@@ -19,6 +19,14 @@ A modern, real-time expense splitting application built with Next.js, Convex, an
 - **Email Service**: Resend
 - **UI Components**: Radix UI primitives
 
+## Demo Accounts
+
+Use any of the following demo credentials on the sign-in page:
+
+- **Email**: test@email.com — **Password**: ExploreNow!2025
+- **Email**: sam@gmail.com — **Password**: TalentPortal@2025
+- **Email**: view@example.com — **Password**: TryThisDemo!88
+
 ## Getting Started
 
 ### Prerequisites
